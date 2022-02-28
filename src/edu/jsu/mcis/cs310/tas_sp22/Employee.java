@@ -8,38 +8,31 @@ import java.sql.*;
 
 
 public class Employee {
-    private int id,employeetypeid,departmentid,shiftid ;
-    private String badgeid, firstname, lastname;
-    private char middlename;
-    private LocalDateTime active;
-   
-
-    public Employee(int id, int employeetypeid, int departmentid, int shiftid, String badgeid, String firstname, String lastname, char middlename, LocalDateTime active) {
-        this.id = id;
-        this.employeetypeid = employeetypeid;
-        this.departmentid = departmentid;
-        this.shiftid = shiftid;
-        this.badgeid = badgeid;
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.middlename = middlename;
-        this.active = active;
+    
+    private int id, employeetypeid, departmentid, shiftid;
+    private String badgeid, firstname, lastname, middlename;
+    private LocalDateTime active, inactive;
+    
+    public Employee(HashMap<String, String> params) {
+        
+        this.id = Integer.parseInt(params.get("id"));
+        this.employeetypeid = Integer.parseInt(params.get("employeetypeid"));
+        this.departmentid = Integer.parseInt(params.get("departmentid"));
+        this.shiftid = Integer.parseInt(params.get("shiftid"));
+        this.badgeid = params.get("badgeid");
+        this.firstname = params.get("firstname");
+        this.lastname = params.get("lastname");
+        this.middlename = params.get("middlename");
+        this.active = LocalDateTime.parse(params.get("active"));
+        
     }
-
+  
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
-        try{
-            Connection conn = null;
-            String query = "INSERT INTO employee.id VALUES (?)";
-            PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, id);
-            id = ps.executeUpdate();
-        }
-        catch(SQLException e){e.printStackTrace();}
     }
 
     public int getEmployeetypeid() {
@@ -90,11 +83,11 @@ public class Employee {
         this.lastname = lastname;
     }
 
-    public char getMiddlename() {
+    public String getMiddlename() {
         return middlename;
     }
 
-    public void setMiddlename(char middlename) {
+    public void setMiddlename(String middlename) {
         this.middlename = middlename;
     }
 
@@ -104,6 +97,25 @@ public class Employee {
 
     public void setActive(LocalDateTime active) {
         this.active = active;
+    }
+    public LocalDateTime getInactive(){
+        return inactive;
+    }
+    public void setInactive(LocalDateTime inactive){
+        this.inactive = inactive;
+    }
+    @Override
+    public String toString(){
+    StringBuilder build = new StringBuilder();
+    build.append("#").append(id).append(" ");
+    build.append("(").append(firstname).append(",").append(" ").append(lastname).append(" ").append(middlename).append("): ");
+    build.append("employeetypeid: ").append(employeetypeid).append(", ");
+    build.append("departmentid: ").append(departmentid).append(", ");
+    build.append("shiftid: ").append(shiftid).append(", ");
+    build.append("active: ").append(active).append(", ");
+    build.append("inactive: ").append(inactive);
+    return build.toString();
+    
     }
     
 }
