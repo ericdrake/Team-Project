@@ -36,4 +36,41 @@ public class TASDatabase {
         return conn;
     }
     
+    public Badge getBadge(String id) {
+        
+        Badge b = null;
+        
+        try {  
+            
+            PreparedStatement pstUpdate = null, pstSelect = null;
+            ResultSet resultset = null;
+            
+            String query = "SELECT * FROM badge WHERE id = ?";
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setString(1, id);
+            
+            
+            pstSelect.execute();
+    
+            resultset = pstSelect.getResultSet();
+                
+            if(resultset.next()) {
+                String desc = resultset.getString("description");
+                b = new Badge(id, desc);
+                  
+            }
+           
+        } 
+        
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return b;
+    }
+
+
+    
+    
+    
 }
