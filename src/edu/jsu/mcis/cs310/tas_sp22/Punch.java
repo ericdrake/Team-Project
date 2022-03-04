@@ -1,14 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-
 package edu.jsu.mcis.cs310.tas_sp22;
-/**
- *
- * @author Aneesh
- */
+
+import edu.jsu.mcis.cs310.tas_sp22.PunchType;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,8 +26,8 @@ public class Punch {
         this.punchtypeid = Integer.parseInt(parameters.get("punchtypeid"));
         this.punchId = 0;
 
-        this.time = LocalTime.from(LocalDateTime.parse(parameters.get("time")));
-        this.date = LocalDate.from(LocalDateTime.parse(parameters.get("date")));
+        this.time = LocalTime.from(LocalDateTime.parse(parameters.get("timestamp")));
+        this.date = LocalDate.from(LocalDateTime.parse(parameters.get("timestamp")));
 
         this.adjustedTime = null;
         this.adjustedDate = null;
@@ -109,5 +102,4 @@ public class Punch {
     }
 
 }
-
 
