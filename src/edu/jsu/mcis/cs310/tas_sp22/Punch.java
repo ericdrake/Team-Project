@@ -106,5 +106,4 @@ public class Punch {
     public String toString() {
         return this.printOriginal();
     }
-
 }

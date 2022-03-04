@@ -144,6 +144,47 @@ public class TASDatabase {
     }
 
 
+    public Punch getPunch(int id) {
+
+        Punch punch = null;
+
+        try {
+
+            PreparedStatement pstUpdate = null, pstSelect = null;
+            ResultSet resultset = null;
+
+            String query = "SELECT * FROM event WHERE id = ?";
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setInt(1, id);
+
+
+            pstSelect.execute();
+
+            resultset = pstSelect.getResultSet();
+
+            if(resultset.next()) {
+                HashMap<String, String> parameters = new  HashMap<String,String>();
+                parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
+                parameters.put("badgeid", resultset.getString("terminalid"));
+                parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
+
+                Timestamp timestamp = resultset.getTimestamp("timestamp");
+                LocalDateTime dateTime = timestamp.toLocalDateTime();
+                parameters.put("timestamp", String.valueOf(dateTime));
+                punch = new Punch(parameters);
+
+            }
+
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return punch;
+    }
+
+
 
 
 
