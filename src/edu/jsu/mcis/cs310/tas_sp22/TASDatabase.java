@@ -70,22 +70,22 @@ public class TASDatabase {
         return b;
     }
     
-    public Employee getEmployee(int id){
+    public Employee getEmployee(int id) {
         Employee employee = null;
-        
+
         try {
             String query = "SELECT * FROM employee WHERE id = ?";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setInt(1, id);
-            
+
             ps.execute();
-            
+
             ResultSet rS = ps.getResultSet();
-            
- 
+
+
             if (rS.next()){
                 HashMap<String, String> hp = new HashMap<>();
-                
+
                 hp.put("id", String.valueOf(id));
                 hp.put("badgeid", rS.getString("badgeid") );
                 hp.put("firstname", rS.getString("firstname"));
@@ -95,52 +95,42 @@ public class TASDatabase {
                 hp.put("departmentid", String.valueOf(rS.getInt("departmentid")));
                 hp.put("shiftid", String.valueOf(rS.getInt("shiftid")));
                 hp.put("active", rS.getTimestamp("active").toLocalDateTime().toString());
-                
+
                 java.sql.Timestamp inactive = rS.getTimestamp("inactive");
-                
+
                 if (inactive != null)
-                
+
                     hp.put("inactive", inactive.toLocalDateTime().toString());
 
 
-    public Punch getPunch(int id) {
+                employee = new Employee(hp);
+            }
+        }
 
-        Punch punch = null;
+        catch(SQLException e){e.printStackTrace();}
+        return employee;
+    }
+    
+    public Employee getEmployee(Badge badgeid){
+           Employee employee = null;
 
         try {
+            String query = "SELECT * FROM employee WHERE badgeid = ?";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, badgeid.getId());
 
-            PreparedStatement pstUpdate = null, pstSelect = null;
-            ResultSet resultset = null;
+            ps.execute();
 
-            String query = "SELECT * FROM event WHERE id = ?";
-            pstSelect = connection.prepareStatement(query);
-            pstSelect.setInt(1, id);
+             ResultSet rS = ps.getResultSet();
 
-
-            pstSelect.execute();
-
-            resultset = pstSelect.getResultSet();
-
-            if(resultset.next()) {
-                HashMap<String, String> parameters = new  HashMap<String,String>();
-                parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
-                parameters.put("badgeid", resultset.getString("terminalid"));
-                parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
-
-                Timestamp timestamp = resultset.getTimestamp("timestamp");
-                LocalDateTime dateTime = timestamp.toLocalDateTime();
-                parameters.put("timestamp", String.valueOf(dateTime));
-                punch = new Punch(parameters);
-
+            if (rS.next()){
+                int id = rS.getInt("id");
+                employee = getEmployee(id);
             }
-
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return punch;
+        catch(SQLException e){e.printStackTrace();}
+        return employee;
     }
 
 
@@ -183,9 +173,5 @@ public class TASDatabase {
 
         return punch;
     }
-
-
-
-
 
 }
