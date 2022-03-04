@@ -1,6 +1,8 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
+import java.util.*;
+import java.time.*;
 
 
 public class TASDatabase {
@@ -68,9 +70,67 @@ public class TASDatabase {
         
         return b;
     }
+    
+    public Employee getEmployee(int id){
+        Employee employee = null;
+        
+        try {
+            String query = "SELECT * FROM employee WHERE id = ?";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, id);
+            
+            ps.execute();
+            
+            ResultSet rS = ps.getResultSet();
+            
+ 
+            if (rS.next()){
+                HashMap<String, String> hp = new HashMap<>();
+                
+                hp.put("id", String.valueOf(id));
+                hp.put("badgeid", rS.getString("badgeid") );
+                hp.put("firstname", rS.getString("firstname"));
+                hp.put("middlename", rS.getString("middlename"));
+                hp.put("lastname", rS.getString("lastname"));
+                hp.put("employeetypeid", String.valueOf(rS.getInt("employeetypeid")));
+                hp.put("departmentid", String.valueOf(rS.getInt("departmentid")));
+                hp.put("shiftid", String.valueOf(rS.getInt("shiftid")));
+                hp.put("active", rS.getTimestamp("active").toLocalDateTime().toString());
+                
+                java.sql.Timestamp inactive = rS.getTimestamp("inactive");
+                
+                if (inactive != null)
+                
+                    hp.put("inactive", inactive.toLocalDateTime().toString());
 
-
-    
-    
-    
+                
+                employee = new Employee(hp);
+            }
+        }
+        
+        catch(SQLException e){e.printStackTrace();}
+        return employee;
+    }
+    public Employee getEmployee(Badge badgeid){
+           Employee employee = null;
+        
+        try {
+            String query = "SELECT * FROM employee WHERE badgeid = ?";
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setString(1, badgeid.getId());
+            
+            ps.execute();
+            
+             ResultSet rS = ps.getResultSet();
+            
+            if (rS.next()){
+                int id = rS.getInt("id");
+                employee = getEmployee(id);
+            }
+        }
+        
+        catch(SQLException e){e.printStackTrace();}
+        return employee;
+    }
+  
 }
