@@ -173,5 +173,110 @@ public class TASDatabase {
 
         return punch;
     }
+    
+    // method to receive the shift for given shift id
+    public Shift getShift(int id) {
+        Shift shift = null;
+
+        try {
+
+            // query created to retrieve shift by id
+            String query = "SELECT * FROM shift WHERE id = ?";
+            PreparedStatement pstSelect = connection.prepareStatement(query);
+            pstSelect.setInt(1, id);
+            // execute the query
+            boolean pstSelectExe = pstSelect.execute();
+
+            if (pstSelectExe) {
+                ResultSet resultset = pstSelect.getResultSet();
+                // check the result set
+                if (resultset.next()) {
+                    // obtain the column values from shift table
+                    HashMap<String, String> params = new HashMap<String, String>();
+
+                    params.put("description", resultset.getString("description"));
+
+                    params.put("id", String.valueOf(resultset.getInt("id")));
+
+                    params.put("ShiftStart", resultset.getTime("ShiftStart").toLocalTime().toString());
+
+                    params.put("ShiftStop", resultset.getTime("ShiftStop").toLocalTime().toString());
+
+                    params.put("roundinterval", String.valueOf(resultset.getInt("roundinterval")));
+
+                    params.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
+
+                    params.put("dockpenalty", String.valueOf(resultset.getInt("dockpenalty")));
+
+                    params.put("LunchStart", resultset.getTime("LunchStart").toLocalTime().toString());
+
+                    params.put("LunchStop", resultset.getTime("LunchStop").toLocalTime().toString());
+
+                    params.put("lunchthreshold", String.valueOf(resultset.getInt("lunchthreshold")));
+                    shift = new Shift(params);
+
+                }
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // return shift object
+        return shift;
+    }
+
+    // method to receive the shift for given shift badge
+    public Shift getShift(Badge badge) {
+        Shift shift = null;
+
+        try {
+            //declare necessary variables
+            PreparedStatement pstSelect = null;
+            ResultSet resultset = null;
+
+            // query created to retrieve shift by badge
+            String query = "SELECT s.* FROM shift as s, employee as e, badge as b WHERE e.badgeid = ? AND e.shiftid=s.id";
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            // execute the query
+            boolean pstSelectExe = pstSelect.execute();
+
+            if (pstSelectExe) {
+                resultset = pstSelect.getResultSet();
+                // check the result set
+                if (resultset.next()) {
+                    // obtain the column values from shift table
+                    HashMap<String, String> params = new HashMap<String, String>();
+
+                    params.put("description", resultset.getString("description"));
+
+                    params.put("id", String.valueOf(resultset.getInt("id")));
+
+                    params.put("ShiftStart", resultset.getTime("ShiftStart").toLocalTime().toString());
+
+                    params.put("ShiftStop", resultset.getTime("ShiftStop").toLocalTime().toString());
+
+                    params.put("roundinterval", String.valueOf(resultset.getInt("roundinterval")));
+
+                    params.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
+
+                    params.put("dockpenalty", String.valueOf(resultset.getInt("dockpenalty")));
+
+                    params.put("LunchStart", resultset.getTime("LunchStart").toLocalTime().toString());
+
+                    params.put("LunchStop", resultset.getTime("LunchStop").toLocalTime().toString());
+
+                    params.put("lunchthreshold", String.valueOf(resultset.getInt("lunchthreshold")));
+                    shift = new Shift(params);
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // return shift object
+        return shift;
+    }
 
 }
