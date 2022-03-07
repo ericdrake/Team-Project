@@ -155,7 +155,7 @@ public class TASDatabase {
             if(resultset.next()) {
                 HashMap<String, String> parameters = new  HashMap<String,String>();
                 parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
-                parameters.put("badgeid", resultset.getString("terminalid"));
+                parameters.put("badgeid", resultset.getString("badgeid"));
                 parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
 
                 Timestamp timestamp = resultset.getTimestamp("timestamp");
