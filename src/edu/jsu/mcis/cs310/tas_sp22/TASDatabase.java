@@ -153,14 +153,16 @@ public class TASDatabase {
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
-                HashMap<String, String> parameters = new  HashMap<String,String>();
+                
+                HashMap<String, String> parameters = new HashMap<String,String>();
+                
+                parameters.put("id", String.valueOf(id));
                 parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
                 parameters.put("badgeid", resultset.getString("badgeid"));
                 parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
 
-                Timestamp timestamp = resultset.getTimestamp("timestamp");
-                LocalDateTime dateTime = timestamp.toLocalDateTime();
-                parameters.put("timestamp", String.valueOf(dateTime));
+                parameters.put("timestamp", resultset.getTimestamp("timestamp").toLocalDateTime().toString());
+                
                 punch = new Punch(parameters);
 
             }
