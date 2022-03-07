@@ -14,6 +14,7 @@ public class Shift {
     private LocalTime ShiftStart, ShiftStop, LunchStart, LunchStop;
     private long ShiftDuration, LunchDuration;
 
+    
     public Shift(HashMap<String, String> params){
         System.err.println("Shift ID: " + params.get("id"));
         this.id = Integer.parseInt (params.get ("id"));
