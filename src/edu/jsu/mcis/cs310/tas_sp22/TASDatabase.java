@@ -280,5 +280,39 @@ public class TASDatabase {
         // return shift object
         return shift;
     }
+    
+        public Department getDepartment(int id) {
+
+        Department d = null;
+
+        try {
+
+            PreparedStatement pstSelect = null;
+            ResultSet resultset = null;
+
+            String query = "SELECT * FROM department WHERE id = ?";
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setInt(1, id);
+
+
+            pstSelect.execute();
+
+            resultset = pstSelect.getResultSet();
+
+            if(resultset.next()) {
+                String desc = resultset.getString("description");
+                int terminalId = resultset.getInt("terminalid");
+                d = new Department(id, desc, terminalId);
+
+            }
+
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return d;
+    }
 
 }
