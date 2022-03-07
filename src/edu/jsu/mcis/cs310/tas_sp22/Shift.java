@@ -4,37 +4,38 @@
  */
 package edu.jsu.mcis.cs310.tas_sp22;
 
-/**
- *
- * @author user
- */
+import java.time.LocalTime;
+import java. time.Duration;
+import java.util.HashMap;
+ 
 public class Shift {
-    private int id, roundinterval, graceperiod, dockpenalty, lunchthreshold;
+   private int id ,roundinterval, graceperiod, dockpenalty, lunchthreshold;
     private String description;
     private LocalTime ShiftStart, ShiftStop, LunchStart, LunchStop;
     private long ShiftDuration, LunchDuration;
 
-    public Shift(HashMap<String, String> params) {
+    public Shift(HashMap<String, String> params){
         System.err.println("Shift ID: " + params.get("id"));
-        this.id = Integer.parseInt(params.get("id"));
+        this.id = Integer.parseInt (params.get ("id"));
 
-        this.description = params.get("description");
+        this.description=params.get("description"); 
         this.ShiftStart = LocalTime.parse(params.get("ShiftStart"));
 
         this.ShiftStop = LocalTime.parse(params.get("ShiftStop"));
-        this.roundinterval = Integer.parseInt(params.get("roundinterval"));
-        this.graceperiod = Integer.parseInt(params.get("graceperiod"));
-        this.dockpenalty = Integer.parseInt(params.get("dockpenalty"));
-        this.LunchStart = LocalTime.parse(params.get("LunchStart"));
-        this.LunchStop = LocalTime.parse(params.get("LunchStop"));
-        this.lunchthreshold = Integer.parseInt(params.get("lunchthreshold"));
+        this.roundinterval = Integer.parseInt(params.get ("roundinterval"));
+        this.graceperiod = Integer.parseInt (params.get ("graceperiod")); 
+        this.dockpenalty = Integer.parseInt (params.get ("dockpenalty"));
+        this.LunchStart= LocalTime.parse(params.get ("LunchStart"));
+        this.LunchStop = LocalTime.parse (params.get ("LunchStop"));
+        this.lunchthreshold = Integer.parseInt(params.get ("lunchthreshold"));
 
-        // The minutes between the shiftstart and stop
-        this.ShiftDuration = java.time.Duration.between(ShiftStart, ShiftStop).toMinutes();
+// The minutes between the shiftstart and stop
+        this.ShiftDuration = java.time. Duration. between(ShiftStart, ShiftStop).toMinutes ();
 
-        // The minutes between the lunch start and stop
-        this.LunchDuration = java.time.Duration.between(LunchStart, LunchStop).toMinutes();
-    }
+// The minutes between the lunch start and stop
+
+        this.LunchDuration = java.time. Duration. between(LunchStart, LunchStop).toMinutes ();
+}
 
     public String getDescription() {
         return description;
@@ -128,9 +129,9 @@ public class Shift {
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(description).append(": ").append(ShiftStart);
-        s.append(" - ").append(ShiftStop).append(" (");
-        s.append(ShiftDuration).append(" minutes); Lunch: ");
-        s.append(LunchStart).append(" - ").append(LunchStop);
+        s.append(" - ").append(ShiftStop).append(" (" );
+        s.append(ShiftDuration).append(" minutes); Lunch: " );
+        s.append(LunchStart ).append( " - ").append(LunchStop);
         s.append(" (").append(LunchDuration).append(" minutes)");
         return s.toString();
     }
