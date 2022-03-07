@@ -5,6 +5,7 @@ package edu.jsu.mcis.cs310.tas_sp22;
 import java.util.*;
 import java.time.*;
 import java.sql.*;
+import java.time.format.DateTimeFormatter;
 
 
 public class Employee {
@@ -25,8 +26,11 @@ public class Employee {
         this.middlename = params.get("middlename");
         this.active = LocalDateTime.parse(params.get("active"));
         
+        String inactive = params.get("inactive");
+        if (inactive != null)
+            this.inactive = LocalDateTime.parse(inactive);
+    
     }
-  
     public int getId() {
         return id;
     }
@@ -106,16 +110,19 @@ public class Employee {
     }
     @Override
     public String toString(){
-    StringBuilder build = new StringBuilder();
-    build.append("#").append(id).append(" ");
-    build.append("(").append(firstname).append(",").append(" ").append(lastname).append(" ").append(middlename).append("): ");
-    build.append("employeetypeid: ").append(employeetypeid).append(", ");
-    build.append("departmentid: ").append(departmentid).append(", ");
-    build.append("shiftid: ").append(shiftid).append(", ");
-    build.append("active: ").append(active).append(", ");
-    build.append("inactive: ").append(inactive);
-    return build.toString();
-    
+        StringBuilder sb = new StringBuilder();
+        DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        sb.append("#").append(badgeid).append(" (").append(lastname).append(", ");
+        sb.append(firstname).append(" ").append(middlename).append("): ").append("employeetypeid: ");
+        sb.append(employeetypeid).append(", departmentid: ").append(departmentid).append(", shiftid: ");
+        sb.append(shiftid).append(", active: ").append(dt.format(active));
+        if(inactive == null){
+        sb.append(", inactive: ").append("none");
+        }
+        else{
+            sb.append(", inactive: ").append(dt.format(inactive));
+        }
+        return sb.toString();
     }
     
 }
