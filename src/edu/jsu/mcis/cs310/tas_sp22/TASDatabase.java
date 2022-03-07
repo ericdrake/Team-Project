@@ -166,38 +166,64 @@ public class TASDatabase {
 
      
         
-       public Shift getShift(Badge badgeid) {
+      public Shift getShift(Badge badge) {
         Shift shift = null;
 
         try {
             //declare necessary variables
-            PreparedStatement pstUpdate = null, pstSelect = null;
+            PreparedStatement pstSelect = null;
             ResultSet resultset = null;
 
             // query created to retrieve shift by badge
-            String query = "SELECT * FROM Shift WHERE badgeid = ?";
+            String query = "SELECT s.* FROM shift as s, employee as e, badge as b WHERE e.badgeid = ? AND e.shiftid=s.id";
             pstSelect = connection.prepareStatement(query);
-            pstSelect.setString(1, badgeid.getId());
+            pstSelect.setString(1, badge.getId());
             // execute the query
-            pstSelect.execute();
+            boolean pstSelectExe = pstSelect.execute();
 
-             ResultSet resultSet = pstSelect.getResultSet();
-            // check the result set
-            if (resultset.next()) {
-                // obtain the column values from shift table
-                int id = resultSet.getInt("id");
-                shift = getShift(id);
+            if (pstSelectExe) {
+                resultset = pstSelect.getResultSet();
+                // check the result set
+                if (resultset.next()) {
+                    // obtain the column values from shift table
+                    HashMap<String, String> params = new HashMap<String, String>();
+
+                    params.put("description", resultset.getString("description"));
+
+                    params.put("id", String.valueOf(resultset.getInt("id")));
+
+                    params.put("ShiftStart", resultset.getTime("ShiftStart").toLocalTime().toString());
+
+                    params.put("ShiftStop", resultset.getTime("ShiftStop").toLocalTime().toString());
+
+                    params.put("roundinterval", String.valueOf(resultset.getInt("roundinterval")));
+
+                    params.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
+
+                    params.put("dockpenalty", String.valueOf(resultset.getInt("dockpenalty")));
+
+                    params.put("LunchStart", resultset.getTime("LunchStart").toLocalTime().toString());
+
+                    params.put("LunchStop", resultset.getTime("LunchStop").toLocalTime().toString());
+
+                    params.put("lunchthreshold", String.valueOf(resultset.getInt("lunchthreshold")));
+                    shift = new Shift(params);
+
+                }
             }
-        } 
-        
-       catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         // return shift object
         return shift;
     }
-  
 }
+
+ 
+
+        
+       
+
 
 
          
