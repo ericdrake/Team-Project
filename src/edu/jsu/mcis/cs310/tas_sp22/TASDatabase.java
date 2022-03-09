@@ -1,7 +1,7 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.*;
 
 
 public class TASDatabase {
@@ -314,5 +314,8 @@ public class TASDatabase {
 
         return d;
     }
+       public int insertPunch(Punch p){
+       
+        }
 
 }

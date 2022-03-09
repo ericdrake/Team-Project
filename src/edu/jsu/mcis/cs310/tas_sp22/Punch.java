@@ -7,9 +7,7 @@
  * @author Aneesh
  */
 package edu.jsu.mcis.cs310.tas_sp22;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
@@ -32,6 +30,36 @@ public class Punch {
         this.timestamp = LocalDateTime.parse(parameters.get("timestamp"));
         
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getTerminalid() {
+        return terminalid;
+    }
+
+    public PunchType getPunchtype() {
+        return punchtype;
+    }
+
+    public String getAdjustmenttype() {
+        return adjustmenttype;
+    }
+
+    public String getBadgeid() {
+        return badgeid;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public LocalDateTime getAdjustedtimestamp() {
+        return adjustedtimestamp;
+    }
+    
+    
 
     public String printOriginal() {
         
