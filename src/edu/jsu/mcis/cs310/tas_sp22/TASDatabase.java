@@ -1,7 +1,7 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.*;
+
 
 
 public class TASDatabase {
@@ -70,6 +70,7 @@ public class TASDatabase {
         return b;
     }
     
+    //Method to get Employee data using the integer id value
     public Employee getEmployee(int id) {
         Employee employee = null;
 
@@ -111,6 +112,7 @@ public class TASDatabase {
         return employee;
     }
     
+    //Method to get Employee record using the badgeid value from the Badge class
     public Employee getEmployee(Badge badgeid){
            Employee employee = null;
 
@@ -158,12 +160,12 @@ public class TASDatabase {
                 
                 parameters.put("id", String.valueOf(id));
                 parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
-                parameters.put("badgeid", resultset.getString("badgeid"));
+                String badgeid = resultset.getString("badgeid");
                 parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
 
                 parameters.put("timestamp", resultset.getTimestamp("timestamp").toLocalDateTime().toString());
                 
-                punch = new Punch(parameters);
+                punch = new Punch(parameters, getBadge(badgeid));
 
             }
 
@@ -314,8 +316,43 @@ public class TASDatabase {
 
         return d;
     }
-       public int insertPunch(Punch p){
-       
+        
+        //Insert Punch 
+    public int insertPunch(Punch p) {
+        
+        int result = 0;
+        //Getting the punch values needed
+        int terminalidPunch = p.getTerminalid();
+        Badge badgeid = p.getBadge();
+        int eventtypeid = p.getEventtypeid();
+        
+        //Getting the Department and Employee values needed
+        Employee e1 = getEmployee(badgeid);
+        int departmentid = e1.getDepartmentid();
+        int terminalidDept = getDepartment(departmentid).getTerminalId();
+        
+        if (terminalidPunch == terminalidDept || terminalidPunch == 0) {
+        
+            try {
+                
+                String query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?,?,?,?)";
+                PreparedStatement ps = connection.prepareStatement(query);
+                ps.setInt(1, terminalidPunch);
+                ps.setString(2, badgeid.toString());
+                ps.setTimestamp(3, java.sql.Timestamp.valueOf(p.getOriginalTimestamp()));
+                ps.setInt(4, eventtypeid);
+                
+                result = ps.executeUpdate();
+            }
+            
+            catch(Exception e){e.printStackTrace();}
+        
         }
+        
+          
+
+        return result;
+        
+     }
 
 }

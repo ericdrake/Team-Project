@@ -13,22 +13,44 @@ import java.util.HashMap;
 
 public class Punch {
     
-    private int id, terminalid;
+    private int id, terminalid, eventtypeid;
     private PunchType punchtype;
     
-    private String adjustmenttype, badgeid;
+    private String adjustmenttype;
+    
+    private Badge badge;
     
     private LocalDateTime timestamp, adjustedtimestamp;
 
-    public Punch(HashMap<String, String> parameters) {
+    public Punch(HashMap<String, String> parameters, Badge badge) {
         
         this.id = Integer.parseInt(parameters.get("id"));
         this.terminalid = Integer.parseInt(parameters.get("terminalid"));
-        this.badgeid = parameters.get("badgeid");
         this.punchtype = PunchType.values()[Integer.parseInt(parameters.get("punchtypeid"))];
+        this.eventtypeid = Integer.parseInt(parameters.get("eventtypeid"));
 
         this.timestamp = LocalDateTime.parse(parameters.get("timestamp"));
         
+        this.badge = badge;
+        
+    }
+    
+    public Punch(int terminalid, Badge badge, int eventtypeid) {
+        
+        this.terminalid = terminalid;
+        this.badge = badge;
+        this.eventtypeid = eventtypeid;
+        this.punchtype = PunchType.values()[eventtypeid];
+        
+        this.id = 0;
+        this.timestamp = LocalDateTime.now();
+        this.adjustmenttype = "";
+        this.adjustedtimestamp = null;
+        
+    }
+
+    public int getEventtypeid() {
+        return eventtypeid;
     }
 
     public int getId() {
@@ -47,11 +69,11 @@ public class Punch {
         return adjustmenttype;
     }
 
-    public String getBadgeid() {
-        return badgeid;
+    public Badge getBadge() {
+        return badge;
     }
 
-    public LocalDateTime getTimestamp() {
+    public LocalDateTime getOriginalTimestamp() {
         return timestamp;
     }
 
@@ -69,7 +91,7 @@ public class Punch {
         
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         
-        s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
+        s.append('#').append(badge.getId()).append(' ').append(punchtype).append(": ");
         s.append(dtf.format(timestamp));
         
         return s.toString().toUpperCase();
