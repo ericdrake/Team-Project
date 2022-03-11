@@ -1,5 +1,8 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 
@@ -155,17 +158,18 @@ public class TASDatabase {
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
+                HashMap<String, String> parameters = new  HashMap<String,String>();
                 
-                HashMap<String, String> parameters = new HashMap<String,String>();
                 
-                parameters.put("id", String.valueOf(id));
                 parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
-                String badgeid = resultset.getString("badgeid");
+                parameters.put("badgeid", resultset.getString("badgeid"));
                 parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
 
-                parameters.put("timestamp", resultset.getTimestamp("timestamp").toLocalDateTime().toString());
-                
-                punch = new Punch(parameters, getBadge(badgeid));
+                Timestamp timestamp = resultset.getTimestamp("timestamp");
+                LocalDateTime dateTime = timestamp.toLocalDateTime();
+                parameters.put("timestamp", String.valueOf(dateTime));
+                punch = new Punch(parameters);
+
 
             }
 
@@ -354,5 +358,52 @@ public class TASDatabase {
         return result;
         
      }
+    
+    public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate date){
+        ArrayList<Punch> arrayList = new ArrayList<Punch>();
+//        arrayList = null;
+        try {
+
+            PreparedStatement pstSelect = null;
+            ResultSet resultset = null;
+
+
+            String query = "SELECT * FROM event WHERE badgeid = ?";
+//             Fetch all columns then get localDate from timestamp then filter using the timestamp
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+
+
+            pstSelect.execute();
+
+            resultset = pstSelect.getResultSet();
+
+            while(resultset.next()) {
+                if(LocalDate.from(resultset.getTimestamp("timestamp").toLocalDateTime()).equals(date)){
+
+                HashMap<String, String> parameters = new  HashMap<String,String>();
+                parameters.put("terminalid", String.valueOf(resultset.getInt("terminalid")));
+                parameters.put("badgeid", resultset.getString("badgeid"));
+                parameters.put("punchtypeid", String.valueOf(resultset.getInt("eventtypeid")));
+
+                Timestamp timestamp = resultset.getTimestamp("timestamp");
+                LocalDateTime dateTime = timestamp.toLocalDateTime();
+                parameters.put("timestamp", String.valueOf(dateTime));
+                Punch punch = new Punch(parameters);
+
+                System.out.println(punch.toString());
+                //Add punch to the arraylist
+                arrayList.add(punch);
+                }
+            }
+
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+//        System.out.println(arrayList.toString());
+        return arrayList;
+    }
 
 }
