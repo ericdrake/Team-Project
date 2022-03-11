@@ -326,14 +326,15 @@ public class TASDatabase {
     public int insertPunch(Punch p) {
         
         int result = 0;
+        int genKeys = 0;
         
         //Getting the punch values needed
         int terminalidPunch = p.getTerminalid();
-        Badge badgeid = getBadge(p.getBadgeid());
+        Badge badge = getBadge(p.getBadge());
         int eventtypeid = p.getPunchtype().ordinal();
         
         //Getting the Department and Employee values needed
-        Employee e1 = getEmployee(badgeid);
+        Employee e1 = getEmployee(badge);
         int departmentid = e1.getDepartmentid();
         int terminalidDept = getDepartment(departmentid).getTerminalId();
         
@@ -342,22 +343,30 @@ public class TASDatabase {
             try {
                 
                 String query = "INSERT INTO event (terminalid, badgeid, timestamp, eventtypeid) VALUES (?,?,?,?)";
-                PreparedStatement ps = connection.prepareStatement(query);
+                String colName[] = new String[] { "id" };
+
+                PreparedStatement ps = connection.prepareStatement(query, colName);
+
                 ps.setInt(1, terminalidPunch);
-                ps.setString(2, badgeid.toString());
+                ps.setString(2, badge.getId());
                 ps.setTimestamp(3, java.sql.Timestamp.valueOf(p.getTimestamp()));
                 ps.setInt(4, eventtypeid);
                 
                 result = ps.executeUpdate();
+                
+                if (result == 1) {
+                    ResultSet rs = ps.getGeneratedKeys();
+                    if ( rs.next() ){
+                        genKeys = rs.getInt(1);
+                    }
+                    
+                }
             }
             
             catch(Exception e){e.printStackTrace();}
         
         }
-        
-          
-
-        return result;
+        return genKeys;
         
      }
     

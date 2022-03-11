@@ -65,11 +65,15 @@ public class Punch {
         return adjustmenttype;
     }
 
-    public String getBadgeid() {
+    public String getBadge() {
         return badgeid;
     }
 
     public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+    
+    public LocalDateTime getOriginalTimestamp() {
         return timestamp;
     }
 

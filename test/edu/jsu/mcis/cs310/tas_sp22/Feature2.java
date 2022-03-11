@@ -63,7 +63,7 @@ public class Feature2 {
 		
         /* Get Punch Properties */
         
-        String badgeid = p1.getBadge().getId();
+        String badgeid = p1.getBadge();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
         PunchType punchtype = p1.getPunchtype();
@@ -78,7 +78,7 @@ public class Feature2 {
 		
         /* Compare Punches */
 
-        assertEquals(badgeid, p2.getBadge().getId());
+        assertEquals(badgeid, p2.getBadge());
         
         rts = p2.getOriginalTimestamp();
         
@@ -120,7 +120,7 @@ public class Feature2 {
 		
         /* Get Punch Properties */
         
-        String badgeid = p1.getBadge().getId();
+        String badgeid = p1.getBadge();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
         PunchType punchtype = p1.getPunchtype();
@@ -135,7 +135,7 @@ public class Feature2 {
 		
         /* Compare Punches */
 
-        assertEquals(badgeid, p2.getBadge().getId());
+        assertEquals(badgeid, p2.getBadge());
         
         rts = p2.getOriginalTimestamp();
         
@@ -160,7 +160,7 @@ public class Feature2 {
 		
         /* Get Punch Properties */
         
-        String badgeid = p1.getBadge().getId();
+        String badgeid = p1.getBadge();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
         PunchType punchtype = p1.getPunchtype();
@@ -175,7 +175,7 @@ public class Feature2 {
 		
         /* Compare Punches */
 
-        assertEquals(badgeid, p2.getBadge().getId());
+        assertEquals(badgeid, p2.getBadge());
         
         rts = p2.getOriginalTimestamp();
         
@@ -200,7 +200,7 @@ public class Feature2 {
 		
         /* Get Punch Properties */
         
-        String badgeid = p1.getBadge().getId();
+        String badgeid = p1.getBadge();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
         PunchType punchtype = p1.getPunchtype();
@@ -215,7 +215,7 @@ public class Feature2 {
 		
         /* Compare Punches */
 
-        assertEquals(badgeid, p2.getBadge().getId());
+        assertEquals(badgeid, p2.getBadge());
         
         rts = p2.getOriginalTimestamp();
         
