@@ -43,7 +43,7 @@ public class Punch {
         this.punchtype = PunchType.values()[eventtypeid];
 
         this.id = 0;
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now().withNano(0);
         this.adjustmenttype = "";
         this.adjustedtimestamp = null;
 
