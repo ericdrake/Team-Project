@@ -100,4 +100,12 @@ public class Punch {
     public String toString() {
         return this.printOriginal();
     }
+    
+    public void adjust(Shift s) {
+    
+        LocalTime shiftStart = s.getShiftStart();
+        LocalTime shiftStop = s.getShiftStop();
+        LocalTime lunchStart = s.getLunchStart();
+        LocalTime lunchStop = s.getLunchStop();
+    }
 }

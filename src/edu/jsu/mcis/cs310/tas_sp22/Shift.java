@@ -50,7 +50,7 @@ public class Shift {
     }
 
     public void setShiftStart(LocalTime shiftStart) {
-        this.ShiftStart = ShiftStart;
+        this.ShiftStart = shiftStart;
     }
 
     public LocalTime getShiftStop() {
