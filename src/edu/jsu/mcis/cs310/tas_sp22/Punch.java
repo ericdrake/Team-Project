@@ -120,8 +120,8 @@ public class Punch {
         LocalDateTime lunchStop = timestamp.withHour(s.getLunchStop().getHour())
                 .withMinute(s.getLunchStop().getMinute()).withSecond(0).withNano(0);
         
-        LocalDateTime startInterval = timestamp.withHour(s.getShiftStart().getHour())
-                .withMinute((s.getShiftStart().minusMinutes(s.getroundinterval())).getMinute()).withSecond(0).withNano(0);
+        LocalDateTime startInterval = timestamp.withMinute((s.getShiftStart().minusMinutes(s.getroundinterval())).getMinute())
+                .withSecond(0).withNano(0);
         
         LocalDateTime startGracePeriod = timestamp.withHour(s.getShiftStart().getHour())
                 .withMinute((s.getShiftStart().plusMinutes(s.getgraceperiod())).getMinute()).withSecond(0).withNano(0);
@@ -140,6 +140,7 @@ public class Punch {
         
         DayOfWeek day = timestamp.getDayOfWeek();
         
+        
         if (punchtype == PunchType.CLOCK_IN){
             if (timestamp.isBefore(shiftStart) && timestamp.isAfter(startInterval)){
                 adjustedtimestamp = shiftStart;
@@ -147,20 +148,38 @@ public class Punch {
             }
             else if(timestamp.isAfter(shiftStart) && timestamp.isBefore(startGracePeriod)){
                 adjustedtimestamp = shiftStart;
-                adjustmenttype = "Shift Start"; 
+                adjustmenttype = "Shift Start";
+                
+            }
+            else if(timestamp.isAfter(startGracePeriod) && timestamp.isBefore(startDockPenalty)){
+                adjustedtimestamp = startDockPenalty;
+                adjustmenttype = "Shift Dock";
+            }
+            else if(timestamp.isBefore(lunchStop) && timestamp.isAfter(lunchStart)){
+                adjustedtimestamp = lunchStop;
+                adjustmenttype = "Lunch Stop";
             }
         }
         
-        else if (punchtype == PunchType.values()[0]){
+        else if (punchtype == PunchType.CLOCK_OUT){
             if(timestamp.isAfter(lunchStart) && timestamp.isBefore(lunchStop)){
-         
+                adjustedtimestamp = lunchStart;
+                adjustmenttype = "Lunch Start";
+            }
+            else if(timestamp.isAfter(stopGracePeriod) && timestamp.isBefore(shiftStop)){
+                adjustedtimestamp = shiftStop;
+                adjustmenttype = "Shift Stop";
+            }
+            else if(timestamp.isAfter(shiftStop) && timestamp.isBefore(stopInterval)){
+                adjustedtimestamp = shiftStop;
+                adjustmenttype = "Shift Stop";
+            }
+            
         }
-        else{
-        }
-      
         
-}
     }
+        
+
     
         public String printAdjusted() {
             
@@ -171,7 +190,7 @@ public class Punch {
 
         s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
         s.append(dtf.format(adjustedtimestamp).toUpperCase()).append(' ');
-        s.append(adjustmenttype);
+        s.append("(").append(adjustmenttype).append(")");
 
         return s.toString();
         
