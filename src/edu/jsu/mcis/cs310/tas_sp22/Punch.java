@@ -8,12 +8,15 @@
  */
 package edu.jsu.mcis.cs310.tas_sp22;
 import edu.jsu.mcis.cs310.tas_sp22.PunchType;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 
 public class Punch {
     
@@ -91,12 +94,12 @@ public class Punch {
         StringBuilder s = new StringBuilder();
 
         s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
-        s.append(dtf.format(timestamp).toUpperCase());
+        s.append(dtf.format(timestamp));
 
-        return s.toString();
+        return s.toString().toUpperCase();
         
     }
-   
+
     @Override
     public String toString() {
         return this.printOriginal();
@@ -104,35 +107,70 @@ public class Punch {
 
     public void adjust(Shift s) {
     
-        LocalTime shiftStart = s.getShiftStart();
-        LocalTime shiftStop = s.getShiftStop();
-        LocalTime lunchStart = s.getLunchStart();
-        LocalTime lunchStop = s.getLunchStop();
-        LocalTime startInterval = s.getShiftStart().minusMinutes(s.getroundinterval());
-        LocalTime startGracePeriod = s.getShiftStart().plusMinutes(s.getgraceperiod());
-        LocalTime startDockPenalty = s.getShiftStart().plusMinutes(s.getdockpenalty());
-        LocalTime stopInterval = s.getShiftStop().plusMinutes(s.getroundinterval());
-        LocalTime stopGracePeriod = s.getShiftStop().minusMinutes(s.getgraceperiod());
-        LocalTime stopDockPenalty = s.getShiftStop().minusMinutes(s.getdockpenalty());
-        LocalDate date = timestamp.toLocalDate();
         
-        if(timestamp.toLocalTime().isBefore(shiftStart) && timestamp.toLocalTime().isAfter(startInterval)){
-           adjustedtimestamp = LocalDateTime.of(date, shiftStart);
-           String description =  "(Shift Start)";
-           adjustmenttype = description;     
+        LocalDateTime shiftStart = timestamp.withHour(s.getShiftStart().getHour())
+                .withMinute(s.getShiftStart().getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime shiftStop = timestamp.withHour(s.getShiftStop().getHour())
+                .withMinute(s.getShiftStop().getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime lunchStart = timestamp.withHour(s.getLunchStart().getHour())
+                .withMinute(s.getLunchStart().getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime lunchStop = timestamp.withHour(s.getLunchStop().getHour())
+                .withMinute(s.getLunchStop().getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime startInterval = timestamp.withHour(s.getShiftStart().getHour())
+                .withMinute((s.getShiftStart().minusMinutes(s.getroundinterval())).getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime startGracePeriod = timestamp.withHour(s.getShiftStart().getHour())
+                .withMinute((s.getShiftStart().plusMinutes(s.getgraceperiod())).getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime startDockPenalty = timestamp.withHour(s.getShiftStart().getHour())
+                .withMinute((s.getShiftStart().plusMinutes(s.getdockpenalty())).getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime stopInterval = timestamp.withHour(s.getShiftStop().getHour())
+                .withMinute((s.getShiftStop().plusMinutes(s.getroundinterval())).getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime stopGracePeriod = timestamp.withHour(s.getShiftStop().getHour())
+                .withMinute((s.getShiftStop().minusMinutes(s.getgraceperiod())).getMinute()).withSecond(0).withNano(0);
+        
+        LocalDateTime stopDockPenalty = timestamp.withHour(s.getShiftStop().getHour())
+                .withMinute((s.getShiftStop().minusMinutes(s.getdockpenalty())).getMinute()).withSecond(0).withNano(0);
+        
+        DayOfWeek day = timestamp.getDayOfWeek();
+        
+        if (punchtype == PunchType.CLOCK_IN){
+            if (timestamp.isBefore(shiftStart) && timestamp.isAfter(startInterval)){
+                adjustedtimestamp = shiftStart;
+                adjustmenttype = "Shift Start";
+            }
+            else if(timestamp.isAfter(shiftStart) && timestamp.isBefore(startGracePeriod)){
+                adjustedtimestamp = shiftStart;
+                adjustmenttype = "Shift Start"; 
+            }
         }
         
+        else if (punchtype == PunchType.values()[0]){
+            if(timestamp.isAfter(lunchStart) && timestamp.isBefore(lunchStop)){
+         
+        }
+        else{
+        }
       
         
 }
+    }
     
         public String printAdjusted() {
+            
+            // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
         
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         StringBuilder s = new StringBuilder();
 
         s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
-        s.append(dtf.format(adjustedtimestamp).toUpperCase());
+        s.append(dtf.format(adjustedtimestamp).toUpperCase()).append(' ');
         s.append(adjustmenttype);
 
         return s.toString();
