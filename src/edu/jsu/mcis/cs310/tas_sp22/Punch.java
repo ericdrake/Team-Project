@@ -204,7 +204,6 @@ public class Punch {
                 if(timestamp.getMinute() == 15){
                     adjustedtimestamp = stopDockPenalty;
                     adjustmenttype = "Shift Dock";
-                    System.err.println(stopDockPenalty);
                 }
                 
                 else{
@@ -236,14 +235,12 @@ public class Punch {
                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
                        .withSecond(0).withNano(0);
                    adjustmenttype = "Interval Round";
-                   System.err.println(timestamp);
                }
                
                else {
                adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
                        .withSecond(0).withNano(0);
                adjustmenttype = "Interval Round";
-               System.err.println(timestamp);
                }
             }
 

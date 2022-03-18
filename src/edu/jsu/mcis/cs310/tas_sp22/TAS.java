@@ -13,19 +13,7 @@ public class TAS {
         
         if (db.isConnected()){
             System.err.println("Your Have Successfully Connected To The Database");
-        }
-        
-        
-        
-        Shift s1 = db.getShift(1);
-
-        Punch p2 = db.getPunch(1162);
-        p2.adjust(s1);
-        System.err.print(s1);
-        System.err.println(p2);
-        
-
-        
+        }   
     }
     
 }
