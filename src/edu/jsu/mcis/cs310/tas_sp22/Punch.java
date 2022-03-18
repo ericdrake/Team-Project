@@ -7,16 +7,11 @@
  * @author Aneesh
  */
 package edu.jsu.mcis.cs310.tas_sp22;
-import edu.jsu.mcis.cs310.tas_sp22.PunchType;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
+
 
 public class Punch {
     
@@ -104,7 +99,7 @@ public class Punch {
     public String toString() {
         return this.printOriginal();
     }
-
+    
     public void adjust(Shift s) {
     
         
@@ -120,8 +115,8 @@ public class Punch {
         LocalDateTime lunchStop = timestamp.withHour(s.getLunchStop().getHour())
                 .withMinute(s.getLunchStop().getMinute()).withSecond(0).withNano(0);
         
-        LocalDateTime startInterval = timestamp.withMinute((s.getShiftStart().minusMinutes(s.getroundinterval())).getMinute())
-                .withSecond(0).withNano(0);
+        LocalDateTime startInterval = timestamp.withHour(s.getShiftStart().minusMinutes(s.getroundinterval()).getHour())
+                .withMinute(s.getShiftStart().minusMinutes(s.getroundinterval()).getMinute()).withSecond(0).withNano(0);
         
         LocalDateTime startGracePeriod = timestamp.withHour(s.getShiftStart().getHour())
                 .withMinute((s.getShiftStart().plusMinutes(s.getgraceperiod())).getMinute()).withSecond(0).withNano(0);
@@ -146,41 +141,118 @@ public class Punch {
                 adjustedtimestamp = shiftStart;
                 adjustmenttype = "Shift Start";
             }
+            
             else if(timestamp.isAfter(shiftStart) && timestamp.isBefore(startGracePeriod)){
                 adjustedtimestamp = shiftStart;
                 adjustmenttype = "Shift Start";
-                
+                 
             }
+            
             else if(timestamp.isAfter(startGracePeriod) && timestamp.isBefore(startDockPenalty)){
                 adjustedtimestamp = startDockPenalty;
                 adjustmenttype = "Shift Dock";
             }
+            
             else if(timestamp.isBefore(lunchStop) && timestamp.isAfter(lunchStart)){
                 adjustedtimestamp = lunchStop;
                 adjustmenttype = "Lunch Stop";
             }
+            
+            else if(timestamp.isBefore(startInterval)){
+                int time_second = timestamp.getSecond();
+                int time_minute = timestamp.getMinute();
+                int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
+                if(time_second > 30){
+                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
+                       .withSecond(0).withNano(0);
+                    adjustmenttype = "Interval Round";
+               }
+                
+               else {
+               adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                       .withSecond(0).withNano(0);
+               adjustmenttype = "Interval Round";
+                }
+            }
+                
         }
         
         else if (punchtype == PunchType.CLOCK_OUT){
             if(timestamp.isAfter(lunchStart) && timestamp.isBefore(lunchStop)){
+                if(day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY){
+                    adjustedtimestamp = lunchStart;
+                    adjustmenttype = "Interval Round";
+                }
+                
+                else if (day != DayOfWeek.SATURDAY || day != DayOfWeek.SUNDAY){
                 adjustedtimestamp = lunchStart;
                 adjustmenttype = "Lunch Start";
+                }
             }
+            
             else if(timestamp.isAfter(stopGracePeriod) && timestamp.isBefore(shiftStop)){
                 adjustedtimestamp = shiftStop;
                 adjustmenttype = "Shift Stop";
             }
+            
             else if(timestamp.isAfter(shiftStop) && timestamp.isBefore(stopInterval)){
                 adjustedtimestamp = shiftStop;
                 adjustmenttype = "Shift Stop";
             }
             
-        }
-        
-    }
-        
+            else if(timestamp.isAfter(stopDockPenalty.minusMinutes(1))&& timestamp.isBefore(stopGracePeriod)){
+                if(timestamp.getMinute() == 15){
+                    adjustedtimestamp = stopDockPenalty;
+                    adjustmenttype = "Shift Dock";
+                    System.err.println(stopDockPenalty);
+                }
+                
+                else{
+                adjustedtimestamp = stopDockPenalty;
+                adjustmenttype = "Shift Dock";
+                }
+            }
+            
+            else if(timestamp.getMinute() == 0){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
+            
+            else if(timestamp.getMinute() == 30){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
+            
+            else if(timestamp.getMinute() == 45){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
+            
+            else if(timestamp.isBefore(stopInterval)){
+               int time_second = timestamp.getSecond();
+               int time_minute = timestamp.getMinute();
+               int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
+               if(time_second > 30){
+                   adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
+                       .withSecond(0).withNano(0);
+                   adjustmenttype = "Interval Round";
+                   System.err.println(timestamp);
+               }
+               
+               else {
+               adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                       .withSecond(0).withNano(0);
+               adjustmenttype = "Interval Round";
+               System.err.println(timestamp);
+               }
+            }
 
+        }
+            
+    }
     
+    
+
         public String printAdjusted() {
             
             // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
@@ -194,7 +266,7 @@ public class Punch {
 
         return s.toString();
         
-    }
+        }
      
   
 }
