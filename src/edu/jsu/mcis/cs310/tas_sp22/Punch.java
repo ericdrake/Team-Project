@@ -17,15 +17,16 @@ public class Punch {
     
     private int id, terminalid;
     private PunchType punchtype;
+    
+    private Badge badge;
 
-    private String adjustmenttype, badgeid;
+    private String adjustmenttype, badgeDescription;
 
     private LocalDateTime timestamp, adjustedtimestamp;
 
-    public Punch(HashMap<String, String> parameters) {
+    public Punch(HashMap<String, String> parameters, Badge badge) {
         
         this.terminalid = Integer.parseInt(parameters.get("terminalid"));
-        this.badgeid = parameters.get("badgeid");
         this.punchtype = PunchType.values()[ Integer.parseInt(parameters.get("punchtypeid")) ];
         this.id = Integer.parseInt(parameters.get("id"));
 
@@ -33,18 +34,22 @@ public class Punch {
 
         this.adjustedtimestamp = LocalDateTime.from(LocalDateTime.parse(parameters.get("timestamp")));
         
+        this.badge = badge;
+        
     }
     
     public Punch(int terminalid, Badge badge, int eventtypeid) {
 
         this.terminalid = terminalid;
-        this.badgeid = badge.getId();
+        this.badgeDescription = badge.getDescription();
         this.punchtype = PunchType.values()[eventtypeid];
 
         this.id = 0;
         this.timestamp = LocalDateTime.now().withNano(0);
         this.adjustmenttype = null;
         this.adjustedtimestamp = null;
+        
+        this.badge = badge;
 
     }
 
@@ -64,8 +69,12 @@ public class Punch {
         return adjustmenttype;
     }
 
-    public String getBadge() {
-        return badgeid;
+    public Badge getBadge() {
+        return badge;
+    }
+    
+    public String getBadgeDescription(){
+        return badgeDescription;
     }
 
     public LocalDateTime getTimestamp() {
@@ -88,7 +97,7 @@ public class Punch {
         
         StringBuilder s = new StringBuilder();
 
-        s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
+        s.append('#').append(badge.getId()).append(' ').append(punchtype).append(": ");
         s.append(dtf.format(timestamp));
 
         return s.toString().toUpperCase();
@@ -257,7 +266,7 @@ public class Punch {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         StringBuilder s = new StringBuilder();
 
-        s.append('#').append(badgeid).append(' ').append(punchtype).append(": ");
+        s.append('#').append(badge.getId()).append(' ').append(punchtype).append(": ");
         s.append(dtf.format(adjustedtimestamp).toUpperCase()).append(' ');
         s.append("(").append(adjustmenttype).append(")");
 

@@ -1,4 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -9,6 +10,10 @@ import java.util.*;
 
 public class TASDatabase {
     private final Connection connection;
+    
+    public TASDatabase(){
+        this.connection = openConnection("tasuser", "War Room D", "localhost");
+    }
 
     public TASDatabase(String username, String password, String address){
         this.connection = openConnection(username, password, address);
@@ -169,7 +174,9 @@ public class TASDatabase {
                 LocalDateTime dateTime = timestamp.toLocalDateTime();
                 parameters.put("timestamp", String.valueOf(dateTime));
                 
-                punch = new Punch(parameters);
+                Badge b = getBadge(resultset.getString("badgeid"));
+                
+                punch = new Punch(parameters, b);
 
 
             }
@@ -330,7 +337,7 @@ public class TASDatabase {
         
         //Getting the punch values needed
         int terminalidPunch = p.getTerminalid();
-        Badge badge = getBadge(p.getBadge());
+        Badge badge = p.getBadge();
         int eventtypeid = p.getPunchtype().ordinal();
         
         //Getting the Department and Employee values needed
