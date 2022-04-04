@@ -12,7 +12,7 @@ public class Feature6 {
     @Before
     public void setup() {
         
-        db = new TASDatabase();
+        db = new TASDatabase("tasuser", "War Room D", "localhost");
         
     }
     

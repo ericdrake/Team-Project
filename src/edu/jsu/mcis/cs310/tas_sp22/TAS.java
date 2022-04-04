@@ -16,6 +16,18 @@ public class TAS {
         if (db.isConnected()){
             System.err.println("Your Have Successfully Connected To The Database");
         }
+       
+        Punch p = db.getPunch(882);
+        Badge b = p.getBadge();
+        Shift s = db.getShift(b);
+        
+        ArrayList <Punch> dailypunches = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        for (Punch punch : dailypunches){
+            punch.adjust(s);
+        }
+        System.err.println(calculateTotalMinutes(dailypunches, s));
+        System.out.println(db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate()));
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
