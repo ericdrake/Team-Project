@@ -1,8 +1,6 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
-import java.sql.*;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 /**
@@ -16,52 +14,60 @@ public class TAS {
         if (db.isConnected()){
             System.err.println("Your Have Successfully Connected To The Database");
         }
-       
-        Punch p = db.getPunch(882);
-        Badge b = p.getBadge();
-        Shift s = db.getShift(b);
-        
-        ArrayList <Punch> dailypunches = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-        
-        for (Punch punch : dailypunches){
-            punch.adjust(s);
-        }
-        System.err.println(calculateTotalMinutes(dailypunches, s));
-        System.out.println(db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate()));
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         
-        int numberofPunches = dailypunchlist.size();
         int totalMinutesWorked = 0;
-        LocalTime start;
-        LocalTime stop;
-        LocalTime lunchStart;
-        LocalTime lunchStop;
+        int totalWithLunch = 0;
+        int startHours = 0;
+        int startMinutes = 0;
+        int stopHours = 0;
+        int stopMinutes = 0;
+        boolean pair = false;
+        LocalDateTime punches;
+        int lunchDuration = (int) shift.getLunchDuration();
+        int calculations = 0;
         
-        if (numberofPunches == 1){
-            start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-            totalMinutesWorked = start.getHour() - start.getHour();
+        for (Punch p : dailypunchlist){
+            if ( p.getPunchtype() == PunchType.CLOCK_IN || p.getPunchtype() == PunchType.CLOCK_OUT){
+                
+                if (p.getPunchtype() == PunchType.CLOCK_IN){
+                    pair = false;
+                }
+                
+                if (p.getPunchtype() == PunchType.CLOCK_OUT){
+                    pair = true;
+                }
+            }
+            
+            if (pair == false){
+                punches = p.getAdjustedtimestamp();
+                startHours = punches.getHour();
+                startMinutes = punches.getMinute();
+                
+            }
+            
+            else if (pair == true){ 
+                punches = p.getAdjustedtimestamp();
+                stopHours = punches.getHour();
+                stopMinutes = punches.getMinute();
+                totalWithLunch = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
+                
+                if (totalWithLunch > shift.getlunchthreshold()){
+                    calculations = totalWithLunch - lunchDuration;
+                    totalMinutesWorked = totalMinutesWorked + calculations;
+                }
+                
+                else if (totalWithLunch <= shift.getlunchthreshold()){
+                calculations = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
+                totalMinutesWorked = totalMinutesWorked + calculations; 
+                }
+                
+            }
         }
-        
-        if (numberofPunches == 2){
-                start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-                stop = dailypunchlist.get(1).getAdjustedtimestamp().toLocalTime();
-                totalMinutesWorked = (((stop.getHour() - start.getHour()) * 60) + (stop.getMinute() - start.getMinute()));
-                if(totalMinutesWorked > shift.getlunchthreshold()){
-                    totalMinutesWorked = (int)(totalMinutesWorked - shift.getLunchDuration());
-                }     
-        }
-        
-        if (numberofPunches == 4){
-            start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-            stop = dailypunchlist.get(3).getAdjustedtimestamp().toLocalTime();
-            lunchStart = dailypunchlist.get(1).getAdjustedtimestamp().toLocalTime();
-            lunchStop = dailypunchlist.get(2).getAdjustedtimestamp().toLocalTime();
-            int totalLunch = ((lunchStop.getHour() - lunchStart.getHour()) + (lunchStop.getMinute() - lunchStart.getMinute()));
-            totalMinutesWorked = (((stop.getHour() - start.getHour()) * 60) + ((stop.getMinute() - start.getMinute())) - totalLunch);
-        }
-        
-        return totalMinutesWorked;
-    }
+       
+    return totalMinutesWorked;
+
+}
 }
