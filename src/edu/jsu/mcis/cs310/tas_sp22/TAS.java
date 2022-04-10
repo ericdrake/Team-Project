@@ -1,5 +1,7 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
+import com.google.gson.*;
+import org.json.simple.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -12,8 +14,32 @@ public class TAS {
          TASDatabase db = new TASDatabase("tasuser","War Room D", "localhost");
         
         if (db.isConnected()){
-            System.err.println("Your Have Successfully Connected To The Database");
+            System.err.println("You Have Successfully Connected To The Database");
         }
+        
+          Punch p = db.getPunch(5896);
+          Badge b = db.getBadge(p.getBadge().getId());
+          Shift s = db.getShift(b);
+		
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+           punch.adjust(s);
+          System.err.println(punch.printOriginal());
+          System.out.println(punch.printAdjusted()); 
+           
+        }
+    
+        
+        JSONObject json = new JSONObject();
+        json.put("punches", dailypunchlist);
+        String jsonString = JSONValue.toJSONString(json);
+         
+         System.err.println(jsonString);
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){

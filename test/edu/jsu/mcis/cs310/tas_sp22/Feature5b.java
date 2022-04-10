@@ -35,6 +35,7 @@ public class Feature5b {
         
         assertEquals(544, minutes);
     }
+    
     @Test
     public void testminutesAccruedDuringWeekend() {
     
@@ -55,6 +56,7 @@ public class Feature5b {
         
         assertEquals(373, minutes);
     }
+    
     @Test
     public void testminutesAccruedDuringWeekDayWithTimeout() {
     
@@ -75,8 +77,9 @@ public class Feature5b {
         
         assertEquals(0, minutes);
     }
+    
     @Test
-     public void testminutesAccruedDuringWeekdays2() {
+    public void testminutesAccruedDuringWeekdays2() {
     
         Punch p = db.getPunch(882);
         Badge b = p.getBadge();
