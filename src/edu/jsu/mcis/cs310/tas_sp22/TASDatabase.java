@@ -1,9 +1,17 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
 import java.sql.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.temporal.IsoFields;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
+import java.util.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.*;
@@ -415,5 +423,134 @@ public class TASDatabase {
         return arrayList;
         
     }
+ public ArrayList<Punch> getPayPeriodPunchList(Badge badge, LocalDate payPeriod, Shift s){
+        ArrayList<Punch> arrayList = new ArrayList<Punch>();
+
+
+        //Get weekNumber
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int weekNumber = payPeriod.get(weekOfYear);
+
+        //Get all dates on that  week and place them in an array
+        ArrayList<LocalDate> weekDates = new ArrayList<>();
+
+        //Fetch each date: Did not have a fancy way of doing this so i hard coded it
+        LocalDate sundayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+        weekDates.add(sundayDate);
+
+        LocalDate mondayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        weekDates.add(mondayDate);
+
+        LocalDate tuesdayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.TUESDAY));
+        weekDates.add(tuesdayDate);
+
+        LocalDate wednesdayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.WEDNESDAY));
+        weekDates.add(wednesdayDate);
+ 
+        LocalDate thursdayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.THURSDAY));
+        weekDates.add(thursdayDate);
+
+        LocalDate fridayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));
+        weekDates.add(fridayDate);
+
+        LocalDate saturdayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.SATURDAY));
+        weekDates.add(saturdayDate);
+
+
+        //get daily punchlist
+        for(int i = 0; i < weekDates.size(); i++){
+            List<Punch> currentDatePunchList = getDailyPunchList(badge, weekDates.get(i));
+            arrayList.addAll(currentDatePunchList);
+        }
+        System.out.println("Punchlist fetch " + arrayList.toString());
+        return arrayList;
+    }
+
+    public Absenteeism getAbsenteeism(Badge badge, LocalDate payPeriod){
+        Absenteeism absenteeism= null;
+        //Get weekNumber
+        TemporalField weekOfYear = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear();
+        int weekNumber = payPeriod.get(weekOfYear);
+
+        
+
+        //Fetch each date: Did not have a fancy way of doing this so i hard coded it
+        LocalDate sundayDate = payPeriod
+                .with(IsoFields.WEEK_OF_WEEK_BASED_YEAR, weekNumber)
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+
+        try {
+
+            PreparedStatement pstUpdate = null, pstSelect = null;
+            ResultSet resultset = null;
+            
+            String query = "SELECT * FROM absenteeism WHERE  badgeid = ? AND payperiod = ?";
+            pstSelect = connection.prepareStatement(query);
+            pstSelect.setString(1, badge.getId());
+            
+            
+            pstSelect.setDate(2, java.sql.Date.valueOf(sundayDate));
+
+            pstSelect.execute();
+
+            resultset = pstSelect.getResultSet();
+
+            if(resultset.next()) {
+                //Get columns
+                Double percentage = resultset.getDouble("percentage");
+                //Create absenteeism
+                System.out.println("Percent" + percentage);
+
+                absenteeism = new Absenteeism(badge, payPeriod, percentage);
+            }
+
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+           System.out.println("Fetched " + badge.getId() + " " + absenteeism);
+        return absenteeism;
+    }
+
+    public int insertAbsenteeism(Absenteeism absenteeism){
+        int result = 0;
+
+        //
+        try {
+
+            String query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?,?,?)";
+
+            PreparedStatement ps = connection.prepareStatement(query);
+
+            ps.setString(1, absenteeism.getBadgeid());
+            ps.setTimestamp(2, Timestamp.valueOf(absenteeism.getPayPeriod().atStartOfDay()));
+            ps.setDouble(3, absenteeism.getAbsenteeismPercentage());
+
+            result = ps.executeUpdate();
+
+
+        }
+
+        catch(Exception e){e.printStackTrace();}
+        return result;
+    }
+
+
 
 }
