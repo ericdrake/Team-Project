@@ -13,7 +13,7 @@ public class Feature2 {
     @Before
     public void setup() {
         
-        db = new TASDatabase();
+        db = new TASDatabase("tasuser", "War Room D", "localhost");
         
     }
     
@@ -224,5 +224,6 @@ public class Feature2 {
         assertEquals(ots.format(dtf), rts.format(dtf));
         
     }
+
     
 }

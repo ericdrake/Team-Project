@@ -1,5 +1,10 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
+import edu.jsu.mcis.cs310.tas_sp22.Badge;
+import edu.jsu.mcis.cs310.tas_sp22.Punch;
+import edu.jsu.mcis.cs310.tas_sp22.Shift;
+import edu.jsu.mcis.cs310.tas_sp22.TAS;
+import edu.jsu.mcis.cs310.tas_sp22.TASDatabase;
 import org.junit.*;
 import static org.junit.Assert.*;
 import java.util.*;
