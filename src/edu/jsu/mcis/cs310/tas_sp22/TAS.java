@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.json.simple.*;
 import java.lang.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
         
 /**
  *
@@ -18,26 +19,7 @@ public class TAS {
         
         if (db.isConnected()){
             System.err.println("You Have Successfully Connected To The Database");
-        }
-        
-          Punch p = db.getPunch(5896);
-          Badge b = db.getBadge(p.getBadge().getId());
-          Shift s = db.getShift(b);
-		
-        /* Get Daily Punch List */
-        
-        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-        
-        /* Adjust Punches */
-        
-        for (Punch punch : dailypunchlist) {
-           punch.adjust(s);
- 
-        }
-        System.err.println(getPunchListAsJSON(dailypunchlist));
-    
-        
-       
+        }   
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
@@ -94,29 +76,24 @@ public class TAS {
     return totalMinutesWorked;
 
 }
-    public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){  
-     ArrayList<HashMap<String, String >> jsonData = new ArrayList<>();
-             for(Punch p : dailyPunchList){
-                  HashMap<String, String > punchData = new HashMap<>();
-                  punchData.put("id", String.valueOf(p.getId()));
-                  punchData.put("badgeid", p.getBadge().getId()); 
-                  punchData.put("terminalid", String.valueOf(p.getTerminalid()));
-                  punchData.put("punchtypeid", String.valueOf(p.getPunchtype()));
-                  punchData.put("adjustmenttype", p.getAdjustmenttype()); 
-                  punchData.put("originaltimestamp", String.valueOf(p.printOriginal()));
-                  punchData.put("adjustedtimestamp", String.valueOf(p.printAdjusted()));
+    public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
+        ArrayList<HashMap<String, String >> jsonData = new ArrayList<>();
+        for(Punch p : dailyPunchList){
+            HashMap<String, String > punchData = new HashMap<>(); 
+            punchData.put("originaltimestamp", String.valueOf(dtf.format(p.getOriginalTimestamp()).toUpperCase()));
+            punchData.put("badgeid", String.valueOf(p.getBadge().getId()));
+            punchData.put("adjustedtimestamp", String.valueOf(dtf.format(p.getAdjustedtimestamp()).toUpperCase()));
+            punchData.put("adjustmenttype", p.getAdjustmenttype());
+            punchData.put("terminalid", String.valueOf(p.getTerminalid()));
+            punchData.put("id", String.valueOf(p.getId()));
+            punchData.put("punchtype", String.valueOf(p.getPunchtype()));
+            
+            jsonData.add(punchData);  
+        }
+        String json = JSONValue.toJSONString(jsonData);
+        return json;     
                  
-                  
-                  jsonData.add(punchData);  
-             }
-                          String json = JSONValue.toJSONString(jsonData);
-                          return json;
-                          
-                              
-                              
-                              
-                  
-                 
-             }
+    }
  }
 
