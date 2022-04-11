@@ -13,7 +13,7 @@ public class Feature2 {
     @Before
     public void setup() {
         
-        db = new TASDatabase("tasuser", "War Room D","localhost");
+        db = new TASDatabase("tasuser", "War Room D", "localhost");
         
     }
     
@@ -66,7 +66,7 @@ public class Feature2 {
         String badgeid = p1.getBadge().getId();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
-        PunchType punchtype = p1.;
+        PunchType punchtype = p1.getPunchtype();
 		
         /* Insert Punch Into Database */
         
@@ -225,10 +225,5 @@ public class Feature2 {
         
     }
 
-    private static class PunchType {
-
-        public PunchType() {
-        }
-    }
     
 }

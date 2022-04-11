@@ -1,8 +1,7 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
-import java.sql.*;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import org.json.simple.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.simple.*;
@@ -18,58 +17,84 @@ public class TAS {
          TASDatabase db = new TASDatabase("tasuser","War Room D", "localhost");
         
         if (db.isConnected()){
-            System.err.println("Your Have Successfully Connected To The Database");
-           
-        } 
-            Punch p = db.getPunch(3634);
-                Badge b = db.getBadge(p.getBadge().getId());
-                Shift s = db.getShift(b);
-                ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-                for (Punch punch : dailypunchlist) {
-                            punch.adjust(s);}
-                getPunchListAsJSON(dailypunchlist);
-                
-                            
-              
-              
+            System.err.println("You Have Successfully Connected To The Database");
+        }
+        
+          Punch p = db.getPunch(5896);
+          Badge b = db.getBadge(p.getBadge().getId());
+          Shift s = db.getShift(b);
+		
+        /* Get Daily Punch List */
+        
+        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        
+        /* Adjust Punches */
+        
+        for (Punch punch : dailypunchlist) {
+           punch.adjust(s);
+ 
+        }
+        System.err.println(getPunchListAsJSON(dailypunchlist));
+    
+        
+       
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         
-        int numberofPunches = dailypunchlist.size();
         int totalMinutesWorked = 0;
-        LocalTime start;
-        LocalTime stop;
-        LocalTime lunchStart;
-        LocalTime lunchStop;
+        int totalWithLunch = 0;
+        int startHours = 0;
+        int startMinutes = 0;
+        int stopHours = 0;
+        int stopMinutes = 0;
+        boolean pair = false;
+        LocalDateTime punches;
+        int lunchDuration = (int) shift.getLunchDuration();
+        int calculations = 0;
         
-        if (numberofPunches == 1){
-            start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-            totalMinutesWorked = start.getHour() - start.getHour();
+        for (Punch p : dailypunchlist){
+            if ( p.getPunchtype() == PunchType.CLOCK_IN || p.getPunchtype() == PunchType.CLOCK_OUT){
+                
+                if (p.getPunchtype() == PunchType.CLOCK_IN){
+                    pair = false;
+                }
+                
+                if (p.getPunchtype() == PunchType.CLOCK_OUT){
+                    pair = true;
+                }
+            }
+            
+            if (pair == false){
+                punches = p.getAdjustedtimestamp();
+                startHours = punches.getHour();
+                startMinutes = punches.getMinute();
+                
+            }
+            
+            else if (pair == true){ 
+                punches = p.getAdjustedtimestamp();
+                stopHours = punches.getHour();
+                stopMinutes = punches.getMinute();
+                totalWithLunch = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
+                
+                if (totalWithLunch > shift.getlunchthreshold()){
+                    calculations = totalWithLunch - lunchDuration;
+                    totalMinutesWorked = totalMinutesWorked + calculations;
+                }
+                
+                else if (totalWithLunch <= shift.getlunchthreshold()){
+                calculations = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
+                totalMinutesWorked = totalMinutesWorked + calculations; 
+                }
+                
+            }
         }
-        
-        if (numberofPunches == 2){
-                start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-                stop = dailypunchlist.get(1).getAdjustedtimestamp().toLocalTime();
-                totalMinutesWorked = (((stop.getHour() - start.getHour()) * 60) + (stop.getMinute() - start.getMinute()));
-                if(totalMinutesWorked > shift.getlunchthreshold()){
-                    totalMinutesWorked = (int)(totalMinutesWorked - shift.getLunchDuration());
-                }     
-        }
-        
-        if (numberofPunches == 4){
-            start = dailypunchlist.get(0).getAdjustedtimestamp().toLocalTime();
-            stop = dailypunchlist.get(3).getAdjustedtimestamp().toLocalTime();
-            lunchStart = dailypunchlist.get(1).getAdjustedtimestamp().toLocalTime();
-            lunchStop = dailypunchlist.get(2).getAdjustedtimestamp().toLocalTime();
-            int totalLunch = ((lunchStop.getHour() - lunchStart.getHour()) + (lunchStop.getMinute() - lunchStart.getMinute()));
-            totalMinutesWorked = (((stop.getHour() - start.getHour()) * 60) + ((stop.getMinute() - start.getMinute())) - totalLunch);
-        }
-        
-        return totalMinutesWorked;
-    }
+       
+    return totalMinutesWorked;
 
- public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){  
+}
+    public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){  
      ArrayList<HashMap<String, String >> jsonData = new ArrayList<>();
              for(Punch p : dailyPunchList){
                   HashMap<String, String > punchData = new HashMap<>();
@@ -78,8 +103,8 @@ public class TAS {
                   punchData.put("terminalid", String.valueOf(p.getTerminalid()));
                   punchData.put("punchtypeid", String.valueOf(p.getPunchtype()));
                   punchData.put("adjustmenttype", p.getAdjustmenttype()); 
-                  punchData.put("originaltimestamp", String.valueOf(p.getOriginalTimestamp()));
-                  punchData.put("adjustedtimestamp", String.valueOf(p.getAdjustedtimestamp()));
+                  punchData.put("originaltimestamp", String.valueOf(p.printOriginal()));
+                  punchData.put("adjustedtimestamp", String.valueOf(p.printAdjusted()));
                  
                   
                   jsonData.add(punchData);  
@@ -95,6 +120,3 @@ public class TAS {
              }
  }
 
-
-
- 

@@ -1,5 +1,10 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
+import edu.jsu.mcis.cs310.tas_sp22.Badge;
+import edu.jsu.mcis.cs310.tas_sp22.Punch;
+import edu.jsu.mcis.cs310.tas_sp22.Shift;
+import edu.jsu.mcis.cs310.tas_sp22.TAS;
+import edu.jsu.mcis.cs310.tas_sp22.TASDatabase;
 import java.util.*;
 import org.json.simple.*;
 
@@ -13,7 +18,7 @@ public class Feature8 {
     @Before
     public void setup() {
         
-        db = new TASDatabase();
+        db = new TASDatabase("tasuser", "War Room D", "localhost");
         
     }
     
