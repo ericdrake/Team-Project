@@ -4,7 +4,11 @@ import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import org.json.simple.*;
+import java.lang.*;
+import java.time.LocalDateTime;
+        
 /**
  *
  * @author user
@@ -15,7 +19,19 @@ public class TAS {
         
         if (db.isConnected()){
             System.err.println("Your Have Successfully Connected To The Database");
-        }
+           
+        } 
+            Punch p = db.getPunch(3634);
+                Badge b = db.getBadge(p.getBadge().getId());
+                Shift s = db.getShift(b);
+                ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+                for (Punch punch : dailypunchlist) {
+                            punch.adjust(s);}
+                getPunchListAsJSON(dailypunchlist);
+                
+                            
+              
+              
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
@@ -52,4 +68,33 @@ public class TAS {
         
         return totalMinutesWorked;
     }
-}
+
+ public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){  
+     ArrayList<HashMap<String, String >> jsonData = new ArrayList<>();
+             for(Punch p : dailyPunchList){
+                  HashMap<String, String > punchData = new HashMap<>();
+                  punchData.put("id", String.valueOf(p.getId()));
+                  punchData.put("badgeid", p.getBadge().getId()); 
+                  punchData.put("terminalid", String.valueOf(p.getTerminalid()));
+                  punchData.put("punchtypeid", String.valueOf(p.getPunchtype()));
+                  punchData.put("adjustmenttype", p.getAdjustmenttype()); 
+                  punchData.put("originaltimestamp", String.valueOf(p.getOriginalTimestamp()));
+                  punchData.put("adjustedtimestamp", String.valueOf(p.getAdjustedtimestamp()));
+                 
+                  
+                  jsonData.add(punchData);  
+             }
+                          String json = JSONValue.toJSONString(jsonData);
+                          return json;
+                          
+                              
+                              
+                              
+                  
+                 
+             }
+ }
+
+
+
+ 

@@ -13,7 +13,7 @@ public class Feature2 {
     @Before
     public void setup() {
         
-        db = new TASDatabase();
+        db = new TASDatabase("tasuser", "War Room D","localhost");
         
     }
     
@@ -66,7 +66,7 @@ public class Feature2 {
         String badgeid = p1.getBadge().getId();
         ots = p1.getOriginalTimestamp();
         int terminalid = p1.getTerminalid();
-        PunchType punchtype = p1.getPunchtype();
+        PunchType punchtype = p1.;
 		
         /* Insert Punch Into Database */
         
@@ -223,6 +223,12 @@ public class Feature2 {
         assertEquals(punchtype, p2.getPunchtype());
         assertEquals(ots.format(dtf), rts.format(dtf));
         
+    }
+
+    private static class PunchType {
+
+        public PunchType() {
+        }
     }
     
 }
