@@ -25,21 +25,7 @@ public class TAS {
         
         ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
         
-        /* Adjust Punches */
-        
-        for (Punch punch : dailypunchlist) {
-           punch.adjust(s);
-          System.err.println(punch.printOriginal());
-          System.out.println(punch.printAdjusted()); 
-           
-        }
-    
-        
-        JSONObject json = new JSONObject();
-        json.put("punches", dailypunchlist);
-        String jsonString = JSONValue.toJSONString(json);
-         
-         System.err.println(jsonString);
+       
     }
     
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
