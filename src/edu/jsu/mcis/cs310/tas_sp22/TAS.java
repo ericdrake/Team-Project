@@ -113,5 +113,16 @@ public class TAS {
         return json;     
                  
     }
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {	
+        for (Punch punch : punchlist) {	
+            punch.adjust(s);
+            }	
+        	
+        int scheduledWork = 2400;	
+        int totalMinuteWorked = calculateTotalMinutes(punchlist, s);	
+        double absenteeism = (100.0 - ((double)totalMinuteWorked / (double)scheduledWork * 100.0));	
+        	
+        return absenteeism;	
+    }
  }
 
