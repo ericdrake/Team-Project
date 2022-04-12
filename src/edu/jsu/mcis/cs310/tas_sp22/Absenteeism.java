@@ -64,8 +64,6 @@ public class Absenteeism {
     //"#28DC3FB8 (Pay Period Starting 09-02-2018): 2.50%"
     public String toString(){
         
-        // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
-        
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MM-dd-yyyy");
         StringBuilder s = new StringBuilder();
 
@@ -73,7 +71,6 @@ public class Absenteeism {
         s.append(String.format("%.2f", getAbsenteeismPercentage())).append('%');
 
         return s.toString();
-        //return "#" + getBadgeid() + " (Pay Period starting " + getPayPeriod() + "): " + getAbsenteeismPercentage() +"%";
     }
 }
 

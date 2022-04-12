@@ -30,25 +30,20 @@ public class Feature7 {
         
         LocalDateTime ts = p.getOriginalTimestamp();
         
-        System.out.println("Payperiod " + ts.toString());
         ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
-        System.out.println("Punchlist"  + punchlist.toString());
         
         /* Compute Pay Period Total Absenteeism */
         
         double percentage = TAS.calculateAbsenteeism(punchlist, s);
-        System.out.println("Percentage"  +percentage);
         
         /* Insert Absenteeism Into Database */
         
         Absenteeism a1 = new Absenteeism(b, ts.toLocalDate(), percentage);
         db.insertAbsenteeism(a1);
-        System.out.println("Fetched: " + db.insertAbsenteeism(a1));
         
         /* Retrieve Absenteeism From Database */
         
         Absenteeism a2 = db.getAbsenteeism(b, ts.toLocalDate());
-        System.out.println(" a2: "+ a2);
         
         /* Compare to Expected Value */
         

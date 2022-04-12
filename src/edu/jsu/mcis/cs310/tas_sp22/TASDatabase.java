@@ -476,7 +476,7 @@ public class TASDatabase {
             List<Punch> currentDatePunchList = getDailyPunchList(badge, weekDates.get(i));
             arrayList.addAll(currentDatePunchList);
         }
-        System.out.println("Punchlist fetch " + arrayList.toString());
+        
         return arrayList;
     }
 
@@ -513,7 +513,6 @@ public class TASDatabase {
                 //Get columns
                 Double percentage = resultset.getDouble("percentage");
                 //Create absenteeism
-                System.out.println("Percent" + percentage);
 
                 absenteeism = new Absenteeism(badge, payPeriod, percentage);
             }
@@ -524,7 +523,7 @@ public class TASDatabase {
             e.printStackTrace();
         }
 
-           System.out.println("Fetched " + badge.getId() + " " + absenteeism);
+           
         return absenteeism;
     }
 
@@ -534,7 +533,7 @@ public class TASDatabase {
         //
         try {
 
-            String query = "INSERT INTO absenteeism (badgeid, payperiod, percentage) VALUES (?,?,?)";
+            String query = "REPLACE INTO absenteeism (badgeid, payperiod, percentage) VALUES (?,?,?)";
 
             PreparedStatement ps = connection.prepareStatement(query);
 
