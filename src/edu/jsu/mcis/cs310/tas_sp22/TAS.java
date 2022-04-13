@@ -1,17 +1,12 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
+import java.time.DayOfWeek;
 import org.json.simple.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import org.json.simple.*;
-import java.lang.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
         
 /**
  *
@@ -23,23 +18,11 @@ public class TAS {
         
         if (db.isConnected()){
             System.err.println("You Have Successfully Connected To The Database");
-        }
-        Punch p = db.getPunch(5896);
-        Badge b = db.getBadge(p.getBadge().getId());
-        Shift s = db.getShift(b);
-		
-        /* Get Daily Punch List */
-        
-        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-        
-        /* Adjust Punches */
-        
-        for (Punch punch : dailypunchlist) {
-            punch.adjust(s);
-        }
-        System.err.println(getPunchListAsJSON(dailypunchlist));
+        } 
     }
     
+        /* Calculate the total number of hours that were accumulated by the employee */
+
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         
         int totalMinutesWorked = 0;
@@ -72,7 +55,7 @@ public class TAS {
                 
             }
             
-            else if (pair == true){ 
+            else if (pair){ 
                 punches = p.getAdjustedtimestamp();
                 stopHours = punches.getHour();
                 stopMinutes = punches.getMinute();
@@ -113,16 +96,22 @@ public class TAS {
         return json;     
                  
     }
-    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {	
-        for (Punch punch : punchlist) {	
-            punch.adjust(s);
-            }	
+    public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {
+
+        
+        int minutesScheduled = s.getTotalScheduledHours();
+        
+        int minutesWorked = calculateTotalMinutes(punchlist, s);
+        
+
+        
+        System.err.println("Scheduled: " + minutesScheduled + ", Worked: " + minutesWorked);
+        double absenteeism = (100.00 - ((double)(minutesWorked / (double)minutesScheduled)) * 100.00);
+
         	
-        int scheduledWork = 2400;	
-        int totalMinuteWorked = calculateTotalMinutes(punchlist, s);	
-        double absenteeism = (100.0 - ((double)totalMinuteWorked / (double)scheduledWork * 100.0));	
-        	
-        return absenteeism;	
+        return absenteeism;
+        
     }
+    
  }
 

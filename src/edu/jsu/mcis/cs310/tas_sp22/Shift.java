@@ -124,6 +124,20 @@ public class Shift {
     public void setShiftDuration(long ShiftDuration) {
         this.ShiftDuration = ShiftDuration;
     }
+    
+    public int getTotalScheduledHours() {
+        
+        int total = 0;
+        
+        for (int i = 0; i < 5; ++i) {
+            
+            total += ( ShiftDuration - LunchDuration );
+            
+        }
+        
+        return total;
+        
+    }
 
     @Override
     public String toString() {

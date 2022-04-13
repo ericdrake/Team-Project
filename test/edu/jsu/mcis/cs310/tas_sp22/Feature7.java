@@ -1,6 +1,5 @@
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import org.junit.*;
@@ -13,7 +12,7 @@ public class Feature7 {
     @Before
     public void setup() {
         
-        db = new TASDatabase();
+        db = new TASDatabase("tasuser", "War Room D", "localhost");
         
     }
     
@@ -29,7 +28,6 @@ public class Feature7 {
         /* Get Pay Period Punch List */
         
         LocalDateTime ts = p.getOriginalTimestamp();
-        
         ArrayList<Punch> punchlist = db.getPayPeriodPunchList(b, ts.toLocalDate(), s);
         
         /* Compute Pay Period Total Absenteeism */
@@ -47,7 +45,7 @@ public class Feature7 {
         
         /* Compare to Expected Value */
         
-        assertEquals("#28DC3FB8 (Pay Period Starting 09-02-2018): 17.25%", a2.toString());
+        assertEquals("#28DC3FB8 (Pay Period Starting 09-02-2018): 2.50%", a2.toString());
         
     }
     
@@ -80,7 +78,7 @@ public class Feature7 {
         
         /* Compare to Expected Value */
         
-        assertEquals("#F1EE0555 (Pay Period Starting 08-05-2018): -20.17%", a2.toString());
+        assertEquals("#F1EE0555 (Pay Period Starting 08-05-2018): -20.00%", a2.toString());
         
     }
     
@@ -113,7 +111,7 @@ public class Feature7 {
         
         /* Compare to Expected Value */
         
-        assertEquals("#08D01475 (Pay Period Starting 09-16-2018): -15.00%", a2.toString());
+        assertEquals("#08D01475 (Pay Period Starting 09-16-2018): -27.50%", a2.toString());
         
     }
     

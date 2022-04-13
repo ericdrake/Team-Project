@@ -172,8 +172,13 @@ public class Punch {
                 int time_minute = timestamp.getMinute();
                 int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
                 if(time_second > 30){
+                    if(time_minute == 30){
+                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(timestamp.getMinute()).withSecond(0).withNano(0);
+                    }
+                    else{
                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
                        .withSecond(0).withNano(0);
+                    }
                     adjustmenttype = "Interval Round";
                }
                 
@@ -249,16 +254,47 @@ public class Punch {
                else {
                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
                             .withSecond(0).withNano(0);
-                    adjustmenttype = "Interval Round";
-               }
+                   adjustmenttype = "Interval Round";
             }
-
-        }
+            }
+            else if (timestamp.isAfter(stopInterval)){
+               int time_second = timestamp.getSecond();
+               int time_minute = timestamp.getMinute();
+               int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
+               if (time_second > 30){
+                   if(time_minute > 30){
+                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                       .withSecond(0).withNano(0); 
+                   }
+                   
+                   else{
+                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                       .withSecond(0).withNano(0);
+                   }
+                   
+                   adjustmenttype = "Interval Round";
+               }
+               
+               else if(time_second < 30){
+                   if(time_minute > 30){
+                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                       .withSecond(0).withNano(0); 
+                   }
+                   else{
+                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                            .withSecond(0).withNano(0);   
+                   }
+                    
+                   adjustmenttype = "Interval Round";
+            }
+            }
             
-    }
-    
-    
+        }
 
+    }
+      
+ 
+    
         public String printAdjusted() {
             
             // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
