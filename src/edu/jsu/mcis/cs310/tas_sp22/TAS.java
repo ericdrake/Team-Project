@@ -20,7 +20,7 @@ public class TAS {
             System.err.println("You Have Successfully Connected To The Database");
         } 
     }
-    
+        
         /* Calculate the total number of hours that were accumulated by the employee */
 
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
