@@ -174,6 +174,7 @@ public class Punch {
                 if(time_second > 30){
                     if(time_minute == 30){
                         adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(timestamp.getMinute()).withSecond(0).withNano(0);
+                        
                     }
                     else{
                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
