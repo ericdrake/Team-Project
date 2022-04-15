@@ -1,12 +1,9 @@
 
 package edu.jsu.mcis.cs310.tas_sp22;
-import java.time.DayOfWeek;
 import org.json.simple.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
         
 /**
  *
@@ -19,19 +16,6 @@ public class TAS {
         if (db.isConnected()){
             System.err.println("You Have Successfully Connected To The Database");
         } 
-        Punch p = db.getPunch(882);
-        Badge b = p.getBadge();
-        Shift s = db.getShift(b);
-        
-        ArrayList <Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
-        
-        for (Punch punch : dailypunchlist){
-            punch.adjust(s);
-            System.err.println(punch.printOriginal());
-            System.err.println(punch.printAdjusted());
-        }
-        
-        System.err.println(calculateTotalMinutes(dailypunchlist, s));
     }
         
         /* Calculate the total number of hours that were accumulated by the employee */
