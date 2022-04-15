@@ -127,5 +127,19 @@ public class TAS {
         
     }
     
+    public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s){
+        HashMap<String, String> output = new HashMap<>();
+        String punchListAsJson = getPunchListAsJSON(punchlist);
+         
+
+        output.put("totalminutes", String.valueOf(calculateTotalMinutes(punchlist, s)));
+        output.put("absenteeism", String.format("%.02f", calculateAbsenteeism(punchlist, s)) + "%");
+        JSONObject obj = (JSONObject) JSONValue.parse(JSONValue.toJSONString(output));
+        obj.put("punchlist", JSONValue.parse(punchListAsJson));
+
+        return JSONValue.toJSONString(obj);
+
+    }
+    
  }
 
