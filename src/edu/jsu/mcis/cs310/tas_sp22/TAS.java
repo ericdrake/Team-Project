@@ -19,20 +19,19 @@ public class TAS {
         if (db.isConnected()){
             System.err.println("You Have Successfully Connected To The Database");
         } 
-        Punch p = db.getPunch(5896);
-        Badge b = db.getBadge(p.getBadge().getId());
+        Punch p = db.getPunch(882);
+        Badge b = p.getBadge();
         Shift s = db.getShift(b);
-		
-        /* Get Daily Punch List */
         
-        ArrayList<Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
+        ArrayList <Punch> dailypunchlist = db.getDailyPunchList(b, p.getOriginalTimestamp().toLocalDate());
         
-        /* Adjust Punches */
-        
-        for (Punch punch : dailypunchlist) {
+        for (Punch punch : dailypunchlist){
             punch.adjust(s);
+            System.err.println(punch.printOriginal());
+            System.err.println(punch.printAdjusted());
         }
-        System.err.println(getPunchListAsJSON(dailypunchlist));
+        
+        System.err.println(calculateTotalMinutes(dailypunchlist, s));
     }
         
         /* Calculate the total number of hours that were accumulated by the employee */

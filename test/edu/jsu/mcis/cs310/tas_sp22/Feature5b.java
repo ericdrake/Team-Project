@@ -33,7 +33,7 @@ public class Feature5b {
         
         //To compare results
         
-        assertEquals(544, minutes);
+        assertEquals(540, minutes);
     }
     
     @Test
@@ -96,7 +96,7 @@ public class Feature5b {
         
         //To compare results
         
-        assertEquals(542, minutes);
+        assertEquals(540, minutes);
     }
     
 }

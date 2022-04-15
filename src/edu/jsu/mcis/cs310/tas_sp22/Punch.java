@@ -166,20 +166,28 @@ public class Punch {
                 adjustedtimestamp = lunchStop;
                 adjustmenttype = "Lunch Stop";
             }
+            else if (timestamp.getMinute() == 0){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
+            
+            else if (timestamp.getMinute() == 30){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
+            
+            else if (timestamp.getMinute() == 45){
+                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
+                adjustmenttype = "None";
+            }
             
             else if (timestamp.isBefore(startInterval)){
                 int time_second = timestamp.getSecond();
                 int time_minute = timestamp.getMinute();
                 int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
                 if(time_second > 30){
-                    if(time_minute == 30){
-                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(timestamp.getMinute()).withSecond(0).withNano(0);
-                        
-                    }
-                    else{
                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
                        .withSecond(0).withNano(0);
-                    }
                     adjustmenttype = "Interval Round";
                }
                 
@@ -188,6 +196,7 @@ public class Punch {
                        .withSecond(0).withNano(0);
                adjustmenttype = "Interval Round";
                 }
+                
             }
                 
         }
