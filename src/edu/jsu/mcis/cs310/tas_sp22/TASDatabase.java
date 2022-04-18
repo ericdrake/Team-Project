@@ -11,10 +11,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 
-
-
-
 public class TASDatabase {
+    
     private final Connection connection;
     
     public TASDatabase(){
@@ -26,29 +24,39 @@ public class TASDatabase {
     }
 
     public boolean isConnected(){
+        
         boolean connected = false;
+        
         try {
             if( !(connection == null))
                 connected = !(connection.isClosed());
         }
         catch (SQLException e) {e.printStackTrace();}
+        
         return connected;
+        
     }
 
     private Connection openConnection(String u, String p, String a){
+        
         Connection conn = null;
 
-        if(a.equals("") || u.equals("") || p.equals(""))
-            System.err.println("ERROR: PLEASE SPECIFY THE ADDRESS/USERNAME/PASSWORD BEFORE OPENING THE DATABASE CONNECTION ");
+        if(a.equals("") || u.equals("") || p.equals("")){
+            
+            System.err.println("ERROR: PLEASE SPECIFY THE ADDRESS/USERNAME/PASSWORD BEFORE OPENING THE DATABASE CONNECTION");
+        }
         else {
+            
             try {
                 String url = "jdbc:mysql://" + a + "/tas_sp22_v1?autoReconnect=true&useSSL=false&zeroDateTimeBehavior=EXCEPTION&serverTimezone=America/Chicago";
                 // System.err.println("Connecting to " + url + "...");
                 conn = DriverManager.getConnection(url,u,p);
             }
-            catch (Exception e){e.printStackTrace();}
+            catch (Exception e){ e.printStackTrace(); }
         }
+        
         return conn;
+        
     }
 
     public Badge getBadge(String id) {
@@ -64,12 +72,12 @@ public class TASDatabase {
             pstSelect = connection.prepareStatement(query);
             pstSelect.setString(1, id);
 
-
             pstSelect.execute();
 
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
+                
                 String desc = resultset.getString("description");
                 b = new Badge(id, desc);
 
@@ -77,15 +85,15 @@ public class TASDatabase {
 
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        catch (Exception e) { e.printStackTrace(); }
 
         return b;
+        
     }
     
     //Method to get Employee data using the integer id value
     public Employee getEmployee(int id) {
+        
         Employee employee = null;
 
         try {
@@ -97,8 +105,8 @@ public class TASDatabase {
 
             ResultSet rS = ps.getResultSet();
 
-
             if (rS.next()){
+                
                 HashMap<String, String> hp = new HashMap<>();
 
                 hp.put("id", String.valueOf(id));
@@ -113,22 +121,26 @@ public class TASDatabase {
 
                 java.sql.Timestamp inactive = rS.getTimestamp("inactive");
 
-                if (inactive != null)
+                if (inactive != null){
 
                     hp.put("inactive", inactive.toLocalDateTime().toString());
 
+                }
 
                 employee = new Employee(hp);
             }
         }
 
-        catch(SQLException e){e.printStackTrace();}
+        catch(SQLException e){ e.printStackTrace(); }
+        
         return employee;
+        
     }
     
     //Method to get Employee record using the badgeid value from the Badge class
     public Employee getEmployee(Badge badgeid){
-           Employee employee = null;
+        
+        Employee employee = null;
 
         try {
             String query = "SELECT * FROM employee WHERE badgeid = ?";
@@ -137,7 +149,7 @@ public class TASDatabase {
 
             ps.execute();
 
-             ResultSet rS = ps.getResultSet();
+            ResultSet rS = ps.getResultSet();
 
             if (rS.next()){
                 int id = rS.getInt("id");
@@ -145,8 +157,10 @@ public class TASDatabase {
             }
         }
 
-        catch(SQLException e){e.printStackTrace();}
+        catch(SQLException e){ e.printStackTrace(); }
+        
         return employee;
+        
     }
 
 
@@ -163,12 +177,12 @@ public class TASDatabase {
             pstSelect = connection.prepareStatement(query);
             pstSelect.setInt(1, id);
 
-
             pstSelect.execute();
 
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
+                
                 HashMap<String, String> parameters = new  HashMap<String,String>();
                 
                 parameters.put("id", String.valueOf(id));
@@ -189,15 +203,15 @@ public class TASDatabase {
 
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        catch (Exception e) { e.printStackTrace(); }
 
         return punch;
+        
     }
     
     // method to receive the shift for given shift id
     public Shift getShift(int id) {
+        
         Shift shift = null;
 
         try {
@@ -210,46 +224,39 @@ public class TASDatabase {
             boolean pstSelectExe = pstSelect.execute();
 
             if (pstSelectExe) {
+                
                 ResultSet resultset = pstSelect.getResultSet();
                 // check the result set
                 if (resultset.next()) {
+                    
                     // obtain the column values from shift table
                     HashMap<String, String> params = new HashMap<String, String>();
-
                     params.put("description", resultset.getString("description"));
-
                     params.put("id", String.valueOf(resultset.getInt("id")));
-
                     params.put("ShiftStart", resultset.getTime("ShiftStart").toLocalTime().toString());
-
                     params.put("ShiftStop", resultset.getTime("ShiftStop").toLocalTime().toString());
-
                     params.put("roundinterval", String.valueOf(resultset.getInt("roundinterval")));
-
                     params.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
-
                     params.put("dockpenalty", String.valueOf(resultset.getInt("dockpenalty")));
-
                     params.put("LunchStart", resultset.getTime("LunchStart").toLocalTime().toString());
-
                     params.put("LunchStop", resultset.getTime("LunchStop").toLocalTime().toString());
-
                     params.put("lunchthreshold", String.valueOf(resultset.getInt("lunchthreshold")));
+                    
                     shift = new Shift(params);
-
+               
                 }
 
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // return shift object
+        } catch (Exception e) { e.printStackTrace(); }
+        
         return shift;
+        
     }
 
     // method to receive the shift for given shift badge
     public Shift getShift(Badge badge) {
+        
         Shift shift = null;
 
         try {
@@ -265,43 +272,35 @@ public class TASDatabase {
             boolean pstSelectExe = pstSelect.execute();
 
             if (pstSelectExe) {
+                
                 resultset = pstSelect.getResultSet();
                 // check the result set
                 if (resultset.next()) {
+                    
                     // obtain the column values from shift table
                     HashMap<String, String> params = new HashMap<String, String>();
-
                     params.put("description", resultset.getString("description"));
-
                     params.put("id", String.valueOf(resultset.getInt("id")));
-
                     params.put("ShiftStart", resultset.getTime("ShiftStart").toLocalTime().toString());
-
                     params.put("ShiftStop", resultset.getTime("ShiftStop").toLocalTime().toString());
-
                     params.put("roundinterval", String.valueOf(resultset.getInt("roundinterval")));
-
                     params.put("graceperiod", String.valueOf(resultset.getInt("graceperiod")));
-
                     params.put("dockpenalty", String.valueOf(resultset.getInt("dockpenalty")));
-
                     params.put("LunchStart", resultset.getTime("LunchStart").toLocalTime().toString());
-
                     params.put("LunchStop", resultset.getTime("LunchStop").toLocalTime().toString());
-
                     params.put("lunchthreshold", String.valueOf(resultset.getInt("lunchthreshold")));
+                    
                     shift = new Shift(params);
 
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // return shift object
+        } catch (Exception e) { e.printStackTrace(); }
+        
         return shift;
+        
     }
     
-        public Department getDepartment(int id) {
+    public Department getDepartment(int id) {
 
         Department d = null;
 
@@ -314,12 +313,12 @@ public class TASDatabase {
             pstSelect = connection.prepareStatement(query);
             pstSelect.setInt(1, id);
 
-
             pstSelect.execute();
 
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
+                
                 String desc = resultset.getString("description");
                 int terminalId = resultset.getInt("terminalid");
                 d = new Department(id, desc, terminalId);
@@ -328,14 +327,12 @@ public class TASDatabase {
 
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        catch (Exception e) { e.printStackTrace(); }
 
         return d;
+        
     }
         
-        //Insert Punch 
     public int insertPunch(Punch p) {
         
         int result = 0;
@@ -376,24 +373,24 @@ public class TASDatabase {
                 }
             }
             
-            catch(Exception e){e.printStackTrace();}
+            catch(Exception e){ e.printStackTrace(); }
         
         }
+        
         return genKeys;
         
      }
     
     public ArrayList<Punch> getDailyPunchList(Badge badge, LocalDate date){
+        
         ArrayList<Punch> arrayList = new ArrayList<Punch>();
-//        arrayList = null;
         try {
 
             PreparedStatement pstSelect = null;
             ResultSet resultset = null;
 
-
             String query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? HAVING tsdate = ?";
-//             Fetch all columns then get localDate from timestamp then filter using the timestamp
+            //Fetch all columns then get localDate from timestamp then filter using the timestamp
             pstSelect = connection.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setString(2, date.toString());
@@ -412,10 +409,8 @@ public class TASDatabase {
 
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-//        System.out.println(arrayList.toString());
+        catch (Exception e) { e.printStackTrace(); }
+        
         return arrayList;
         
     }
@@ -426,7 +421,6 @@ public class TASDatabase {
         TemporalField fieldUS = WeekFields.of(Locale.US).dayOfWeek();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         
-        //String query = "SELECT *, DATE(`timestamp`) AS tsdate FROM event WHERE badgeid = ? HAVING tsdate BETWEEN ? AND ?";
         String query = "SELECT * FROM event WHERE badgeid = ? AND DATE(`timestamp`) BETWEEN CAST(? AS DATE) AND CAST(? AS DATE) ORDER BY `timestamp`";
         
         try {
@@ -452,18 +446,17 @@ public class TASDatabase {
             }
         }
             
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+        catch (Exception e) { e.printStackTrace(); }
         
         return arrayList;
+        
     }
 
     public Absenteeism getAbsenteeism(Badge badge, LocalDate payPeriod){
+        
         Absenteeism absenteeism = null;
         String query = "SELECT * FROM absenteeism where badgeid = ? AND payperiod = ? ";
-        
-
+   
         try {
             LocalDate endOfPay = payPeriod.with(payPeriod.getDayOfWeek().SATURDAY);
             LocalDate startOfPay = payPeriod.with(endOfPay.minusDays(6));
@@ -473,33 +466,30 @@ public class TASDatabase {
             pstSelect = connection.prepareStatement(query);
             pstSelect.setString(1, badge.getId());
             pstSelect.setString(2, startOfPay.toString());
-            
-
+     
             pstSelect.execute();
 
             resultset = pstSelect.getResultSet();
 
             if(resultset.next()) {
-                //Get columns
+                
                 Double percentage = resultset.getDouble("percentage");
-                //Create absenteeism
                 absenteeism = new Absenteeism(badge, payPeriod, percentage);
+                
             }
 
         }
 
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-           
+        catch (Exception e) { e.printStackTrace(); }
+  
         return absenteeism;
+        
     }
 
-    public int insertAbsenteeism(Absenteeism absenteeism){
+    public int insertAbsenteeism(Absenteeism absenteeism) {
+        
         int result = 0;
 
-        //
         try {
 
             String query = "REPLACE INTO absenteeism (badgeid, payperiod, percentage) VALUES (?,?,?)";
@@ -512,13 +502,12 @@ public class TASDatabase {
 
             result = ps.executeUpdate();
 
-
         }
 
-        catch(Exception e){e.printStackTrace();}
+        catch(Exception e){ e.printStackTrace(); }
+        
         return result;
+        
     }
-
-
 
 }

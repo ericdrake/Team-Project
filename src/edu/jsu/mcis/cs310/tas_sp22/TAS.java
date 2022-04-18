@@ -1,15 +1,12 @@
-
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import org.json.simple.*;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-        
-/**
- *
- * @author user
- */
+
 public class TAS {
+    
     public static void main(String[] args){
          TASDatabase db = new TASDatabase("tasuser","War Room D", "localhost");
         
@@ -18,7 +15,7 @@ public class TAS {
         } 
     }
         
-        /* Calculate the total number of hours that were accumulated by the employee */
+    /* Calculate the total number of hours that were accumulated by the employee */
 
     public static int calculateTotalMinutes(ArrayList<Punch> dailypunchlist, Shift shift){
         
@@ -30,10 +27,11 @@ public class TAS {
         int stopMinutes = 0;
         boolean pair = false;
         LocalDateTime punches;
-        int lunchDuration = (int) shift.getLunchDuration();
+        int lunchDuration = (int)shift.getLunchDuration();
         int calculations = 0;
         
         for (Punch p : dailypunchlist){
+            
             if ( p.getPunchtype() == PunchType.CLOCK_IN || p.getPunchtype() == PunchType.CLOCK_OUT){
                 
                 if (p.getPunchtype() == PunchType.CLOCK_IN){
@@ -46,6 +44,7 @@ public class TAS {
             }
             
             if (pair == false){
+                
                 punches = p.getAdjustedtimestamp();
                 startHours = punches.getHour();
                 startMinutes = punches.getMinute();
@@ -53,6 +52,7 @@ public class TAS {
             }
             
             else if (pair){ 
+                
                 punches = p.getAdjustedtimestamp();
                 stopHours = punches.getHour();
                 stopMinutes = punches.getMinute();
@@ -64,20 +64,24 @@ public class TAS {
                 }
                 
                 else if (totalWithLunch <= shift.getlunchthreshold()){
-                calculations = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
-                totalMinutesWorked = totalMinutesWorked + calculations; 
+                    calculations = ((stopHours - startHours) * 60) + (stopMinutes - startMinutes);
+                    totalMinutesWorked = totalMinutesWorked + calculations; 
                 }
                 
             }
         }
        
-    return totalMinutesWorked;
+        return totalMinutesWorked;
 
-}
+    }
+    
     public static String getPunchListAsJSON(ArrayList<Punch> dailyPunchList){
+        
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         ArrayList<HashMap<String, String >> jsonData = new ArrayList<>();
+        
         for(Punch p : dailyPunchList){
+            
             HashMap<String, String > punchData = new HashMap<>(); 
             punchData.put("originaltimestamp", String.valueOf(dtf.format(p.getOriginalTimestamp()).toUpperCase()));
             punchData.put("badgeid", String.valueOf(p.getBadge().getId()));
@@ -88,32 +92,30 @@ public class TAS {
             punchData.put("punchtype", String.valueOf(p.getPunchtype()));
             
             jsonData.add(punchData);  
+            
         }
+        
         String json = JSONValue.toJSONString(jsonData);
         return json;     
                  
     }
+    
     public static double calculateAbsenteeism(ArrayList<Punch> punchlist, Shift s) {
 
-        
         int minutesScheduled = s.getTotalScheduledHours();
-        
         int minutesWorked = calculateTotalMinutes(punchlist, s);
-        
 
-        
         System.err.println("Scheduled: " + minutesScheduled + ", Worked: " + minutesWorked);
         double absenteeism = (100.00 - ((double)(minutesWorked / (double)minutesScheduled)) * 100.00);
 
-        	
         return absenteeism;
         
     }
     
     public static String getPunchListPlusTotalsAsJSON(ArrayList<Punch> punchlist, Shift s){
+        
         HashMap<String, String> output = new HashMap<>();
         String punchListAsJson = getPunchListAsJSON(punchlist);
-         
 
         output.put("totalminutes", String.valueOf(calculateTotalMinutes(punchlist, s)));
         output.put("absenteeism", String.format("%.02f", calculateAbsenteeism(punchlist, s)) + "%");
@@ -124,5 +126,4 @@ public class TAS {
 
     }
     
- }
-
+}

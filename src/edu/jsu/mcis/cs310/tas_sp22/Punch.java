@@ -1,12 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-/**
- *
- * @author Aneesh
- */
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -110,6 +103,8 @@ public class Punch {
     }
     
     public void adjust(Shift s) {
+        
+        int roundInterval = s.getroundinterval();
     
         
         LocalDateTime shiftStart = timestamp.withHour(s.getShiftStart().getHour())
@@ -166,17 +161,7 @@ public class Punch {
                 adjustedtimestamp = lunchStop;
                 adjustmenttype = "Lunch Stop";
             }
-            else if (timestamp.getMinute() == 0){
-                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
-                adjustmenttype = "None";
-            }
-            
-            else if (timestamp.getMinute() == 30){
-                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
-                adjustmenttype = "None";
-            }
-            
-            else if (timestamp.getMinute() == 45){
+            else if ((timestamp.getMinute() % roundInterval) == 0) {
                 adjustedtimestamp = timestamp.withSecond(0).withNano(0);
                 adjustmenttype = "None";
             }
@@ -186,15 +171,16 @@ public class Punch {
                 int time_minute = timestamp.getMinute();
                 int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
                 if(time_second > 30){
-                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
-                       .withSecond(0).withNano(0);
+                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                            .plusMinutes(s.getroundinterval())
+                            .withSecond(0).withNano(0);
                     adjustmenttype = "Interval Round";
-               }
-                
-               else {
-               adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
-                       .withSecond(0).withNano(0);
-               adjustmenttype = "Interval Round";
+                }
+
+                else {
+                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                             .withSecond(0).withNano(0);
+                     adjustmenttype = "Interval Round";
                 }
                 
             }
@@ -202,6 +188,7 @@ public class Punch {
         }
         
         else if (punchtype == PunchType.CLOCK_OUT){
+            
             if (timestamp.isAfter(lunchStart) && timestamp.isBefore(lunchStop)){
                 if(day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY){
                     adjustedtimestamp = lunchStart;
@@ -225,78 +212,72 @@ public class Punch {
             }
             
             else if (timestamp.isAfter(stopDockPenalty.minusMinutes(1))&& timestamp.isBefore(stopGracePeriod)){
-                if(timestamp.getMinute() == 15){
+                if(timestamp.getMinute() == roundInterval){
                     adjustedtimestamp = stopDockPenalty;
                     adjustmenttype = "Shift Dock";
                 }
                 
                 else {
-                adjustedtimestamp = stopDockPenalty;
-                adjustmenttype = "Shift Dock";
+                    adjustedtimestamp = stopDockPenalty;
+                    adjustmenttype = "Shift Dock";
                 }
             }
-            
-            else if (timestamp.getMinute() == 0){
-                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
-                adjustmenttype = "None";
-            }
-            
-            else if (timestamp.getMinute() == 30){
-                adjustedtimestamp = timestamp.withSecond(0).withNano(0);
-                adjustmenttype = "None";
-            }
-            
-            else if (timestamp.getMinute() == 45){
+            else if ((timestamp.getMinute() % roundInterval) == 0) {
                 adjustedtimestamp = timestamp.withSecond(0).withNano(0);
                 adjustmenttype = "None";
             }
             
             else if (timestamp.isBefore(stopInterval)){
-               int time_second = timestamp.getSecond();
-               int time_minute = timestamp.getMinute();
-               int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
-               if (time_second > 30){
-                   adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round).plusMinutes(s.getroundinterval())
-                       .withSecond(0).withNano(0);
-                   adjustmenttype = "Interval Round";
-               }
-               
-               else {
+                
+                int time_second = timestamp.getSecond();
+                int time_minute = timestamp.getMinute();
+                int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
+                if (time_second > 30){
+                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                            .plusMinutes(s.getroundinterval()).withSecond(0).withNano(0);
+                    adjustmenttype = "Interval Round";
+                }
+
+                else {
                     adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
                             .withSecond(0).withNano(0);
                    adjustmenttype = "Interval Round";
+                }
             }
-            }
+            
             else if (timestamp.isAfter(stopInterval)){
-               int time_second = timestamp.getSecond();
-               int time_minute = timestamp.getMinute();
-               int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
-               if (time_second > 30){
-                   if(time_minute > 30){
-                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
-                       .withSecond(0).withNano(0); 
-                   }
-                   
-                   else{
-                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
-                       .withSecond(0).withNano(0);
-                   }
-                   
-                   adjustmenttype = "Interval Round";
-               }
-               
-               else if(time_second < 30){
-                   if(time_minute > 30){
-                       adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
-                       .withSecond(0).withNano(0); 
-                   }
-                   else{
-                    adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                
+                int time_second = timestamp.getSecond();
+                int time_minute = timestamp.getMinute();
+                int interval_round = Math.round((time_minute/s.getroundinterval()) * s.getroundinterval());
+                if (time_second > 30){
+                    if(time_minute > 30){
+                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                        .withSecond(0).withNano(0); 
+                    }
+
+                    else{
+                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                        .withSecond(0).withNano(0);
+                    }
+
+                    adjustmenttype = "Interval Round";
+                }
+
+                else if(time_second < 30){
+
+                    if(time_minute > 30){
+                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
+                            .withSecond(0).withNano(0); 
+                    }
+                    else{
+                        adjustedtimestamp = timestamp.withHour(timestamp.getHour()).withMinute(interval_round)
                             .withSecond(0).withNano(0);   
-                   }
-                    
-                   adjustmenttype = "Interval Round";
-            }
+                    }
+
+                    adjustmenttype = "Interval Round";
+                }
+                
             }
             
         }
@@ -305,9 +286,9 @@ public class Punch {
       
  
     
-        public String printAdjusted() {
+    public String printAdjusted() {
             
-            // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
+        // "#28DC3FB8 CLOCK IN: FRI 09/07/2018 07:00:00 (Shift Start)"
         
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("EEE MM/dd/yyyy HH:mm:ss");
         StringBuilder s = new StringBuilder();
@@ -318,7 +299,7 @@ public class Punch {
 
         return s.toString();
         
-        }
+    }
 
   
 }

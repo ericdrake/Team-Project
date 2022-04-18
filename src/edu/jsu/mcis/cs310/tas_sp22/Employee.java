@@ -1,10 +1,7 @@
-/*
-*@author Favour Ejemole
-*/
 package edu.jsu.mcis.cs310.tas_sp22;
+
 import java.util.*;
 import java.time.*;
-import java.sql.*;
 import java.time.format.DateTimeFormatter;
 
 

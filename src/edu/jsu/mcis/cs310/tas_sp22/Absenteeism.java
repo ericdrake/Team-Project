@@ -1,11 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.jsu.mcis.cs310.tas_sp22;
 
-import static edu.jsu.mcis.cs310.tas_sp22.TAS.calculateAbsenteeism;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -14,6 +8,7 @@ import java.time.format.DateTimeFormatter;
  * @author jasmi
  */
 public class Absenteeism {
+    
     private Badge badge;
     private String badgeid;
     private LocalDate startOfPay;
